@@ -1,0 +1,16 @@
+.flowplayer.is-overlaid {
+  display: none;
+}
+.flowplayer.is-overlaid.is-open {
+  display: block;
+}
+
+.fancybox-flowplayer {
+  width: 80% !important;
+}
+.fancybox-flowplayer .fancybox-inner {
+  width: 100% !important;
+}
+.fancybox-flowplayer .flowplayer.is-loading {
+  background-color: #333;
+}
