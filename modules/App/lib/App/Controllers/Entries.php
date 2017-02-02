@@ -25,7 +25,8 @@ class Entries extends BasePrivate {
                 }
             } elseif ($_POST['action'] == 'delete_entry') {
                 if (!$entry) return;
-                $entry->delete();
+                $entry->deleted = true;
+                $entry->save();
                 $entryId = false;
             }
         }

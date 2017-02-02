@@ -214,6 +214,7 @@ $(function() {
             if (!html) return;
             $('.entry-list').replaceWith($(html).find('.entry-list'));
             bindPlugins($('.entry-list'));
+            $.get(base_url + 'sync-entries');
         });
     });
     
@@ -238,6 +239,8 @@ $(function() {
                 $('.entry-list').replaceWith($(html).find('.entry-list'));
                 bindPlugins($('.entry-list'));
             }
+            
+            $.get(base_url + 'sync-entries');
         });
     });
         

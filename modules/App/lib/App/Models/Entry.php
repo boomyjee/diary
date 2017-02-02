@@ -30,6 +30,12 @@ class Entry extends \ActiveEntity
      */
     public $author;
     
+    /** @Column(type="boolean") */
+    public $synced;
+    
+    /** @Column(type="boolean") */
+    public $deleted;
+    
     /** @Column(type="array", nullable=true) */
     public $attachment_preview_settings;
     
@@ -43,123 +49,75 @@ class Entry extends \ActiveEntity
     
     function __construct() {
         $this->created = new \DateTime('now');
+        $this->text = '';
+        $this->synced = false;
+        $this->deleted = false;
+        $this->attachments = [];
         $this->attachment_previews_settings = [];
     }
    
+    /** @PreUpdate */
+    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $event) {        
+        if ($event->hasChangedField('attachments') || $event->hasChangedField('text') || $event->hasChangedField('deleted')) 
+            $this->synced = false;
+    }
+    
     /** @PostPersist @PostUpdate */
-    public function postPersist() {
-        $config = \Bingo\Config::get('config', 'cloud_mailru');
-        $cloudAPI = new \CloudMailruAPI($config['login'], $config['password'], INDEX_DIR.'/cache/tmp_cookies.dat');
-        $cloudAttachmentsFolder = self::CLOUD_STORAGE_BASE_FOLDER.'/'.$this->id;
-        $localAttachmentsFolder = INDEX_DIR.'/entry_attachments/'.$this->id;
-        if (!file_exists($localAttachmentsFolder))
-            mkdir($localAttachmentsFolder, 0755, $recursive = true);
-        
-        $tmpFilesDir = INDEX_DIR.'/tmp_files';
-        if (!file_exists($tmpFilesDir)) mkdir($tmpFilesDir, 0755);
-        
+    function postPersist() {
         preg_match_all("/#([\w|\p{L}]+)/u", $this->text, $matches);
         $oldTags = $this->getTags();
         $newTags = !empty($matches[1]) ? $matches[1] : [];
-        
+
         \Bingo::$em->createQuery("DELETE Meta\Models\Tag t WHERE t.type = :type AND t.owner_id = :owner_id AND t.value IN (:values)")
             ->setParameter('type', get_class($this))
             ->setParameter('owner_id', $this->id)
             ->setParameter('values', array_diff($oldTags, $newTags))
             ->execute()
         ;
-        $this->setTags($matches[1]);
 
-        $filename = uniqid($this->id.'_').".txt";
-        file_put_contents($tmpFilesDir.'/'.$filename, $this->text);
-        try {
-            $cloudAPI->loadFile($tmpFilesDir.'/'.$filename, self::CLOUD_STORAGE_TEXT_FILENAME, $cloudAttachmentsFolder);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage());
-        }
-        @unlink($tmpFilesDir.'/'.$filename);
-
-        $existedAttachments = [];
-        $cloudFiles = [];
-        try {
-            $cloudFiles = $cloudAPI->getFiles($cloudAttachmentsFolder);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage());
-        }
+        $this->setTags($newTags);
         
-        foreach ($cloudFiles as $file) {
-            if ($file['name'] == self::CLOUD_STORAGE_TEXT_FILENAME) continue;
-            if (!in_array($file['name'], $this->attachments)) {
-                try {
-                    $cloudAPI->removeFile($cloudAttachmentsFolder.'/'.$file['name']);
-                } catch (\Exception $e) {
-                    trigger_error($e->getMessage());
-                }
-                @unlink($localAttachmentsFolder.'/'.$file['name']);
-            } else { 
-                $existedAttachments[] = $file['name'];
-            }
-        }
+        $tmpFilesDir = INDEX_DIR.'/tmp_files';
+        if (!file_exists($tmpFilesDir)) 
+            mkdir($tmpFilesDir, 0700);
+
+        $entryAttachmentsDir = INDEX_DIR.'/entry_attachments/'.$this->id;
+        if (!file_exists($entryAttachmentsDir)) 
+            mkdir($entryAttachmentsDir, 0700, $recursive = true);
+        
+        $entryAttachmentPreviewsDir = $entryAttachmentsDir.'/preview';
+        if (!file_exists($entryAttachmentPreviewsDir)) 
+            mkdir($entryAttachmentPreviewsDir, 0700, $recursive = true);
 
         foreach ($this->attachments as $attachment) {
+            if (file_exists($entryAttachmentsDir.'/'.$attachment)) continue;
             if (!file_exists($tmpFilesDir.'/'.$attachment)) continue;
-            try {
-                $cloudAPI->loadFile($tmpFilesDir.'/'.$attachment, $attachment, $cloudAttachmentsFolder);
-            } catch (\Exception $e) {
-                trigger_error($e->getMessage());
-            }
             
             $attachmentType = self::getAttachmentType($attachment);
             if ($attachmentType == self::ATTACHMENT_TYPE_IMAGE) {
-                $attachmentPreviewPath = $tmpFilesDir.'/preview/'.$attachment;
-                if (file_exists($attachmentPreviewPath)) {
-                    @rename($attachmentPreviewPath, $localAttachmentsFolder.'/preview/'.$attachment);
-                    @unlink($attachmentPreviewPath);
+                $tmpPreviewPath = $tmpFilesDir.'/preview/'.$attachment;
+                if (file_exists($tmpPreviewPath)) {
+                    rename($tmpPreviewPath, $entryAttachmentPreviewsDir.'/'.$attachment);
                 }
-                    
+
                 try {
                     $file = \PhpThumb\Factory::create($tmpFilesDir.'/'.$attachment, ['resizeUp' => false]);
                     $file->resize(1280, 950);
-                    $file->save($localAttachmentsFolder.'/'.$attachment);
+                    $file->save($entryAttachmentsDir.'/'.$attachment);
                 } catch (\Exception $e) {
                     trigger_error($e->getMessage());
                 }
             } else if (in_array($attachmentType, [self::ATTACHMENT_TYPE_OTHER, self::ATTACHMENT_TYPE_AUDIO])) {
-                @rename($tmpFilesDir.'/'.$attachment, $localAttachmentsFolder.'/'.$attachment);
+                copy($tmpFilesDir.'/'.$attachment, $entryAttachmentsDir.'/'.$attachment);
             }
-            
-            @unlink($tmpFilesDir.'/'.$attachment);
         }
     }
-    
-    /** @preRemove */
-    public function preRemove() {
-        $config = \Bingo\Config::get('config', 'cloud_mailru');
-        $cloudAPI = new \CloudMailruAPI($config['login'], $config['password'], INDEX_DIR.'/cache/tmp_cookies.dat');
-        $cloudAttachmentsFolder = self::CLOUD_STORAGE_BASE_FOLDER.'/'.$this->id;
-        $localAttachmentsFolder = INDEX_DIR.'/entry_attachments/'.$this->id;
-        
-        $removeDir = function($path) use(&$removeDir) {
-            $files = glob($path.'/*');
-            foreach ($files as $file) {
-                is_dir($file) ? $removeDir($file) : @unlink($file);
-            }
-            @rmdir($path);
-        };
-
-        try {
-            $cloudAPI->removeFile($cloudAttachmentsFolder);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage());
-        }
-        $removeDir($localAttachmentsFolder);
-    }
-    
     
     public static function getSearchQuery($id = false, $author = null, $text = '', $tags = []) {
         $qb = \Bingo::$em->createQueryBuilder()
             ->select('e')
             ->from('App\Models\Entry', 'e')
+            ->where('e.deleted = false')
             ->orderBy('e.created', 'DESC');
         
         if ($id) {
