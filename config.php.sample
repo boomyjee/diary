@@ -1,0 +1,11 @@
+<?php
+
+$config = [
+    'cloud_mailru' => [
+        'login' => 'your_login',
+        'password' => 'your_password',
+        
+        'diary_folder' => 'your_folder_in_cloud',
+        'texts_file' => 'new_dnev.txt'
+    ]
+];
