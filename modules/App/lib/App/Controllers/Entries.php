@@ -40,7 +40,7 @@ class Entries extends BasePrivate {
             $hashTags = $matches[1];
         }
         
-        $limit = 10;
+        $limit = 5;
         $offset = ($this->getPage() - 1) * $limit;
         $query = Entry::getSearchQuery($entryId, $this->user, $searchText, $hashTags);
         $total = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);

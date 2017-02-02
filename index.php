@@ -7,7 +7,7 @@ ini_set('display_errors',1);
 error_reporting(E_ALL);
 date_default_timezone_set('Europe/Kiev');
 
-\Bingo\Configuration::$applicationMode = 'development';
+\Bingo\Configuration::$applicationMode = 'release';
 \Bingo\Configuration::$locale = 'ru_RU';
 
 \Bingo\Configuration::addModulePath(INDEX_DIR."/modules");

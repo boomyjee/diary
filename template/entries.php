@@ -7,7 +7,12 @@
                 <input type="text" name="search" class="form-control" value="<?= $search_criteria ?>" placeholder="Поиск" >
             </div>
             <? if ($user): ?>
-                <a href="<?= url('logout') ?>" class="logout">Выйти (<?= $user->login ?>)</a>
+                <div class="dropdown">
+                    <span class="main-point" tabindex='1'><?= $user->login ?><span class="dropdown-arrow"></span></span>
+                    <ul class="sub-menu">
+                        <li><a href="<?= url('logout') ?>" class="logout">Выйти</a></li>
+                    </ul>
+                </div>
             <? endif ?>
         </div>
     </div>
@@ -30,8 +35,8 @@
                             <div class="without-prev"></div>
                             <div class="upload-statuses"></div>
                             <div class="buttons">
-                                <a href="#" class="add-attachment pull-left"></a>
-                                <button type="submit" name="action" value="edit_entry" class="btn btn-primary pull-right add-new-entry">Добавить</button>
+                                <a href="#" class="add-attachment pull-left">(приложить файлы)</a>
+                                <button type="submit" name="action" value="edit_entry" class="btn btn-primary pull-right add-new-entry">Отправить</button>
                             </div>
                             <input class="attachment-input" type="file" name="attachment" multiple />
                         </div>
@@ -83,7 +88,7 @@
                                     </div>
                                     <div class="upload-statuses"></div>
                                     <div class="buttons">
-                                        <a href="#" class="add-attachment pull-left"></a>
+                                        <a href="#" class="add-attachment pull-left">(приложить файлы)</a>
                                         <button type="submit" name="action" value="edit_entry" class="btn btn-primary pull-right">Сохранить</button>
                                         <button class="btn btn-primary pull-right cancel">Отмена</button>
                                     </div>
@@ -94,7 +99,7 @@
 
                             <div class="entry-content">
                                 <div class="entry-header">
-                                    <div class="date" title="#<?= $entry->id ?>"><?= $entry->created->format('d.m.Y H:i') ?></div>
+                                    <div class="entry-number">Запись #<?= $entry->id ?></div>
                                     <div class="actions">
                                         <ul>
                                             <li class="edit">Редактировать запись</li>

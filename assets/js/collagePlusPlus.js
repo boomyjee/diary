@@ -276,7 +276,7 @@
                  * Set image position
                  *
                  */
-                $obj.css({'top': rowOffsetTop, 'left': imageOffsetLeft});
+                $obj.css({'top': rowOffsetTop, 'left': imageOffsetLeft}).removeClass('hidden');
                 imageOffsetLeft += $obj.width() + settings.padding;
             }
         }

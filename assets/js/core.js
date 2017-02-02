@@ -43,7 +43,7 @@ $(function() {
                         if (result.status != 'success') {
                             data.context.addClass('error');
                         } else {
-                            attachmentBlock.empty().append($('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename}));
+                            attachmentBlock.empty().append($('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename})).addClass('hidden');
                             if (result.preview_url) {
                                 var preview = $('<img>', {'src': result.preview_url});
                                 $('<img/>').load(function() {
@@ -115,6 +115,10 @@ $(function() {
             if ($(this).find('*').length)
                 $(this).parents('form').addClass('media-added');
         });
+        
+        elem.find('.media-prev, .without-prev, .upload-statuses').removeWhitespace();
+        
+        autosize(elem.find('.entry-form textarea'));
     };
     
     function collage(elem, firstRowHeightPercent, secondaryRowsHeightPercent) {
@@ -127,7 +131,6 @@ $(function() {
             var img	= $(this);
             $('<img/>').load(function() {
                 if(++counter === imgCount) {
-                    imgs.show();
                     container.collagePlusPlus({
                         'firstRowTargetHeight': firstRowHeightPercent * container.width() / 100,
                         'secondaryRowsTargetHeight': secondaryRowsHeightPercent * container.width() / 100
@@ -190,6 +193,7 @@ $(function() {
             form.find('input[name=first_row_height_percent]').val(), 
             form.find('input[name=secondary_rows_height_percent]').val()
         );
+        autosize.update(form.find('textarea'));
     });
 
     $(document).on('click', '.entry .cancel', function(e) {

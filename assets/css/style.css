@@ -61,7 +61,7 @@ body {
     color: #000;
     margin: 0;
     padding: 0;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.154;
     font-weight: 400;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -69,7 +69,7 @@ body {
 }
 
 a {
-    color: #2a5885;
+    color: #337ab7;
     text-decoration: none;
     cursor: pointer;
 }
@@ -115,8 +115,8 @@ a {
 }
 
 .progress {
-  height: 20px;
-  margin-bottom: 20px;
+  height: 18px;
+  margin-bottom: 0;
   overflow: hidden;
   background-color: #f5f5f5;
   border-radius: 4px;
@@ -168,7 +168,7 @@ a {
     text-align: center;
     text-decoration: none;
     background: none;
-    background-color: #5e81a8;
+    background-color: #337ab7;
     color: #fff;
     border: 0;
     border-radius: 2px;
@@ -193,16 +193,53 @@ span.error {
     margin: 0 auto;
     font-size: 12.5px;
     padding: 0 15px;
-    background-color: #507299;
-    overflow: auto;
+    background-color: #101010;
 }
 
-#header .logout {
+#header .dropdown {
     float: right;
     color: #fff;
     display: block;
-    height: 42px;
     line-height: 42px;
+    position: relative;
+}
+#header .dropdown .main-point {
+    padding: 0 15px;
+    line-height: 42px;
+    display: block;
+    outline: none;
+}
+#header .dropdown .main-point:active,
+#header .dropdown .main-point:focus {
+    background-color: #2d2d2d;
+    outline: none;
+}
+#header .dropdown .main-point ~ .sub-menu { 
+    display: none; 
+    position: absolute;
+    top: 35px;
+    right: 0;
+} 
+#header .dropdown .main-point:focus ~ .sub-menu, 
+#header .dropdown .main-point:active ~ .sub-menu, 
+#header .dropdown .main-point ~ .sub-menu:hover { 
+   display: block; 
+} 
+#header .dropdown-arrow {
+    background: url('../images/head_arrow.png') no-repeat;
+    background-position: right 0;
+    margin: 20px 0 0 9px;
+    width: 8px;
+    height: 4px;
+    opacity: 0.55;
+    display: inline-block;
+}
+#header .dropdown .main-point:focus .dropdown-arrow,
+#header .dropdown .main-point:active .dropdown-arrow {
+    opacity: 1;
+}
+#header .dropdown .main-point ~ .sub-menu a {
+    display: block;
 }
 
 #search {
@@ -220,15 +257,10 @@ span.error {
     border-radius: 14px;
     -o-transition: background-color 0.05s, color 0.05s;
     transition: background-color 0.05s, color 0.05s;
-    background: #305075;
+    background: #ffffff url('../images/search_ico.png') no-repeat;
     padding-left: 19px;
     border-left: 8px solid transparent;
     background-position: left 8px;
-    color: #d9e2ec;
-}
-
-#search input:focus {
-    background-color: #fff;
     color: #000;
 }
 
@@ -254,6 +286,9 @@ span.error {
 .add-entry form .controls {
     display: none;
 }
+.add-entry form .textfield textarea {
+    max-height: 50px;
+}
 .add-entry.full .textfield textarea {
     min-height: 100px;
     max-height: none;
@@ -263,47 +298,71 @@ span.error {
     display: block;
 }
 .entry .entry-header {
-    padding: 15px 20px 0;
+    padding: 20px 20px 10px;
 }
 .entry .entry-body {
-    padding: 8px 20px 19px;
+    padding: 0 20px 20px;
     overflow: auto;
 }
-.entry .author {
-    font-size: 13px;
-    margin: 0;
-    font-weight: 600;
-    color: #2a5885;
-    padding: 0 0 5px;
+.entry .entry-body > p {
+    line-height: 1.4;
+    margin: 0 0 10px
 }
-.entry .date {
+.entry .entry-body > p:empty {
+    margin: 0;
+}
+.entry .entry-number {
     font-size: 12.5px;
     color: #939393;
 }
 .entry .actions {
-    background: url(../images/entry_more.png) no-repeat 50%;
+    background: url(../images/entry_more.png) no-repeat right 10px;
     position: absolute;
     width: 22px;
     height: 24px;
-    top: 20px;
-    right: 18px;
+    top: 15px;
+    right: 20px;
     cursor: pointer;
     outline: none;
 }
-.entry .actions > ul {
+.entry .actions > ul,
+#header .dropdown > ul {
     position: relative;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: -13px;
     display: none;
     min-width: 150px;
     max-width: 250px;
     background: #fff;
-    z-index: 4;
+    z-index: 11;
     border: 1px solid #c5d0db;
-    padding: 4px 0;
+    padding: 5px 0;
     border-radius: 3px;
     box-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
+#header .dropdown > ul:before,
+#header .dropdown > ul:after,
+.entry .actions > ul:before,
+.entry .actions > ul:after {
+    position: absolute;
+    pointer-events: none;
+    border: solid transparent;
+    content: '';
+    height: 0;
+    width: 0;
+    bottom: 100%;
+    right: 20.5px;
+    border-width: 6px;
+    margin: 0 -6px;
+    border-bottom-color: #c5d0db;
+}
+#header .dropdown > ul:after,
+.entry .actions > ul:after {
+    border-width: 5px;
+    margin: 0 -5px;
+    border-bottom-color: #fff;
+}
+#header .dropdown > ul li,
 .entry .actions > ul li {
     text-overflow: ellipsis;
     overflow: hidden;
@@ -313,9 +372,11 @@ span.error {
     height: 30px;
     line-height: 30px;
     padding: 0 15px;
-    color: #2a5885;
+    color: #337ab7;
     outline: none;
+    cursor: pointer;
 }
+#header .dropdown > ul li:hover,
 .entry .actions > ul li:hover {
     text-decoration: none;
     background-color: #e4eaf0;
@@ -323,7 +384,7 @@ span.error {
 .entry .actions:hover {
     width: auto;
     height: auto;
-    background: none;
+    cursor: auto;
 }
 .entry .actions:hover > ul {
    display: block;
@@ -336,7 +397,7 @@ span.error {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url(../lib/flowplayer/skin/img/play_black.png) no-repeat 50% 50% / 30%;
+    background: url(../lib/flowplayer/skin/img/play_black.png) no-repeat 50% 50% / 25%;
     z-index: 10;
 }
 .entry .attachments .open-video {
@@ -397,10 +458,11 @@ form.entry-form .textfield textarea {
     padding: 14px 20px 16px 12px;
     border: 0;
     border-radius: 2px;
-    line-height: 1.462;
+    line-height: 1.4;
     word-wrap: break-word;
     resize: none;
     box-shadow: none;
+    color: #000;
 }
 form.entry-form .controls {
     background: #fafbfc;
@@ -441,21 +503,22 @@ form.entry-form .without-prev div p {
     color: #555555;
     font-size: 12px;
     font-weight: bold;
-    margin: 8px 0;
+    margin: 2px 0;
     float: left;
     max-width: 60%;
     text-overflow: ellipsis;
 }
-form.entry-form .without-prev div p {
-    margin: 0 0 10px;
-}
-form.entry-form .upload-statuses > div,
-form.entry-form .without-prev > div {
+form.entry-form .upload-statuses .item,
+form.entry-form .without-prev .item {
     overflow: hidden;
+    margin-bottom: 10px;
+}
+form.entry-form .upload-statuses .item:last-child,
+form.entry-form .without-prev .item:last-child {
+    margin-bottom: 0;
 }
 form.entry-form .upload-statuses .progress {
     width: 35%;
-    margin-top: 5px;
     margin-right: 10px;
     box-shadow: inset 0 0px 5px rgba(0,0,0,0.1);
     float: left;
@@ -479,12 +542,9 @@ form.entry-form .without-prev div span {
 form.entry-form .upload-statuses div span.remove,
 form.entry-form .upload-statuses div.working span,
 form.entry-form .without-prev div span.remove {
-    height: 16px;
+    height: 15px;
     background-position: 0 -13px;
-    margin: 7px;
-}
-form.entry-form .without-prev div span.remove {
-    margin: 0 0 0 5px;
+    margin: 2px 0 0 7px;
 }
 form.entry-form .upload-statuses div.error p {
     color: red;
@@ -492,8 +552,10 @@ form.entry-form .upload-statuses div.error p {
 form.entry-form .add-attachment {
     position: relative;
     display: block;
-    width: 22px;
-    height: 22px;
+    overflow: hidden;
+    font-size: 13px;
+    padding-left: 27px;
+    line-height: 22px;
 }
 form.entry-form .add-attachment:before {
     position: absolute;
@@ -513,6 +575,7 @@ form.entry-form .media-prev span.remove {
     width: 15px;
     height: 15px;
     background-color: rgba(0,0,0,0.5);
+    cursor: pointer;
 }
 form.entry-form .media-prev span.remove:after {
     content: '';
@@ -527,7 +590,8 @@ form.entry-form .media-prev span.remove:after {
 }
 form.entry-form .buttons {
     overflow: hidden;
-    padding-top: 12px;
+    padding-top: 15px;
+    margin-top: 15px;
     border-top: 1px solid #e8eaed;
 }
 form.entry-form .preview-placeholder,
@@ -539,6 +603,7 @@ form.entry-form.media-added .prev-controls {
 }
 form.entry-form .media-prev:empty {
     height: auto !important;
+    margin-bottom: 0;
 }
 form.entry-form input[type=range] {
     -webkit-appearance: none;
@@ -598,7 +663,7 @@ form.entry-form input[type=range]::-ms-track {
     color: transparent;
 }
 form.entry-form input[type=range]::-ms-fill-lower {
-    background: rgba(0, 96, 144, 0.78);
+    background: rgba(0, 113, 169, 0.78);
     border: 0px solid #010101;
     border-radius: 2px;
     box-shadow: 0px 0px 1px #000000, 0px 0px 0px #0d0d0d;
@@ -642,38 +707,24 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 .load-more.loading:before {
     background-size: 70px;
 }
-.media-prev, .upload-statuses {
-    clear: both;
-    overflow: hidden;
-}
 .media-prev {
     position: relative;
     padding-left: 4px;
-    margin-bottom: 10px;
 }
-.media-prev:not(:empty) ~ .upload-statuses, .without-prev:not(:empty) ~ .upload-statuses {
-    border-top: 1px solid #e8eaed;
-}
-.upload-statuses:empty {
-    display: none;
-}
-.upload-statuses {
-    padding: 10px;
+.media-prev:empty + .without-prev:empty + .upload-statuses:empty + .buttons {
+    padding: 0;
+    margin: 0;
+    border: none;
 }
 .media-prev a {
     position: relative;
     overflow:hidden;
-}
-.media-prev:empty ~ .without-prev:empty + .upload-statuses:empty + .buttons {
-    padding: 0;
-    border: none;
 }
 .media-prev.loading,
 .load-more.loading {
     position: relative;
     padding-bottom: 60px;
 }
-
 .media-prev .item {
   -webkit-transition-duration: 0.5s;
      -moz-transition-duration: 0.5s;
@@ -682,7 +733,6 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
           transition-duration: 0.5s;
     position: absolute;
 }
-
 .media-prev .item {
   -webkit-transition-property: height, width;
      -moz-transition-property: height, width;
@@ -690,7 +740,6 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
        -o-transition-property: height, width;
           transition-property: height, width;
 }
-
 .media-prev .item  {
   -webkit-transition-property: left, right, top;
      -moz-transition-property: left, right, top;
@@ -698,8 +747,29 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
        -o-transition-property: left, right, top;
           transition-property: left, right, top;
 }
-
-.attachments .without-prev a {
+.media-prev .item.ui-sortable-helper {
+    transition: none;
+    -webkit-transition: none;
+    -moz-transition: none;
+}
+.media-prev .item.hidden,
+.media-prev.loading > div {
+    visibility: hidden;
+}
+.upload-statuses:empty, .without-prev:empty, .media-prev:empty {
+    display: none;
+}
+.without-prev, .upload-statuses, .media-prev {
+    margin-top: 15px;
+    clear: both;
+    overflow: hidden;
+}
+.media-prev,
+.media-prev:empty + .without-prev,
+.media-prev:empty + .without-prev:empty + .upload-statuses {
+    margin: 0;
+}
+.without-prev a {
     display: block;
     margin-bottom: 10px;
     background: url(../images/post_icon.png) no-repeat;
@@ -711,6 +781,16 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.upload-statuses div:last-child,
+.without-prev a:last-child,
+.without-prev div:last-child {
+    margin: 0;
+}
+.upload-statuses .item.hidden {
+    display: none;
+}
+
 .entry-list .load-more {
     text-align: center;
 }
@@ -724,6 +804,7 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 .login .auth-block {
     max-width: 500px;
     margin: 10% auto;
+    overflow: hidden;
 }
 .login .auth-block input[type=text],
 .login .auth-block input[type=password] {
@@ -735,7 +816,6 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     -webkit-appearance: none;
     border-radius: 0;
 }
-
 .login .auth-block label {
     padding: 0 0 5px;
     color: #656565;
@@ -743,10 +823,10 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     font-weight: 600;
     display: block;
 }
-
 .login .auth-block .checkbox,
 .login .auth-block .inline {
     display: inline-block;
+    padding-bottom: 0;
 }
 
 .login .auth-block .checkbox input[type=checkbox] {
@@ -754,9 +834,11 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     display: inline-block;
     vertical-align: top;
 }
-
 .login .auth-block .form-group {
     padding-bottom: 13px;
+}
+.login .auth-block .form-group:last-child {
+    padding-bottom: 0;
 }
 
 .player .fp-help, .player .fp-context-menu {
