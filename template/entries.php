@@ -62,7 +62,7 @@
                                             <? $attachmentType = \App\Models\Entry::getAttachmentType($attachment); ?>
                                             <? if ($attachmentType == \App\Models\Entry::ATTACHMENT_TYPE_IMAGE): ?>
                                                 <div class="item">
-                                                    <img src="<?= url('attachments/show-preview/'.$entry->id.'/'.rawurlencode($attachment)) ?>">
+                                                    <img src="<?= url('attachments/show-attachment-preview/entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
                                                     <input type="hidden" name="attachments[]" value="<?= $attachment ?>">
                                                     <span class="remove"></span>
                                                 </div>
@@ -123,8 +123,8 @@
                                                     <div class="item">
                                                         <a class="fancybox" 
                                                            data-original-url="<?= url('attachments/show-original-image/'.$entry->id.'/'.rawurlencode($attachment)) ?>" 
-                                                           data-fancybox-group="<?= $entry->id ?>" href="<?= url('attachments/show-resized-image/'.$entry->id.'/'.rawurlencode($attachment)) ?>">
-                                                            <img class="" src="<?= url('attachments/show-preview/'.$entry->id.'/'.rawurlencode($attachment)) ?>">
+                                                           data-fancybox-group="<?= $entry->id ?>" href="<?= url('attachments/show-resized-image/entry_attachments/'.$entry->id.'/resized_images/'.rawurlencode($attachment)) ?>">
+                                                            <img class="" src="<?= url('attachments/show-attachment-preview/entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
                                                         </a>
                                                     </div>
                                                 <? elseif ($attachmentType == \App\Models\Entry::ATTACHMENT_TYPE_VIDEO): ?>

@@ -78,37 +78,31 @@ class Entry extends \ActiveEntity
         $this->setTags($newTags);
         
         $tmpFilesDir = INDEX_DIR.'/tmp_files';
-        if (!file_exists($tmpFilesDir)) 
-            mkdir($tmpFilesDir, 0700);
-
-        $entryAttachmentsDir = INDEX_DIR.'/entry_attachments/'.$this->id;
-        if (!file_exists($entryAttachmentsDir)) 
-            mkdir($entryAttachmentsDir, 0700, $recursive = true);
+        $attachmentsDir = INDEX_DIR.'/entry_attachments/'.$this->id;
         
-        $entryAttachmentPreviewsDir = $entryAttachmentsDir.'/preview';
-        if (!file_exists($entryAttachmentPreviewsDir)) 
-            mkdir($entryAttachmentPreviewsDir, 0700, $recursive = true);
+        $directories = [
+            $tmpFilesDir,
+            $attachmentsDir,
+            $attachmentsDir.'/images_preview',
+            $attachmentsDir.'/resized_images'
+        ];
+        
+        foreach ($directories as $dir) 
+            if (!file_exists($dir)) mkdir($dir, 0755);
 
         foreach ($this->attachments as $attachment) {
-            if (file_exists($entryAttachmentsDir.'/'.$attachment)) continue;
+            if (file_exists($attachmentsDir.'/'.$attachment)) continue;
             if (!file_exists($tmpFilesDir.'/'.$attachment)) continue;
             
             $attachmentType = self::getAttachmentType($attachment);
-            if ($attachmentType == self::ATTACHMENT_TYPE_IMAGE) {
-                $tmpPreviewPath = $tmpFilesDir.'/preview/'.$attachment;
-                if (file_exists($tmpPreviewPath)) {
-                    rename($tmpPreviewPath, $entryAttachmentPreviewsDir.'/'.$attachment);
-                }
-
-                try {
-                    $file = \PhpThumb\Factory::create($tmpFilesDir.'/'.$attachment, ['resizeUp' => false]);
-                    $file->resize(1280, 950);
-                    $file->save($entryAttachmentsDir.'/'.$attachment);
-                } catch (\Exception $e) {
-                    trigger_error($e->getMessage());
+            if ($attachmentType == self::ATTACHMENT_TYPE_IMAGE) {                
+                foreach (['images_preview', 'resized_images'] as $subDir) {
+                    if (file_exists($attachmentsDir.'/'.$subDir.'/'.$attachment)) continue;
+                    if (file_exists($tmpFilesDir.'/'.$subDir))
+                        rename($tmpFilesDir.'/'.$subDir.'/'.$attachment, $attachmentsDir.'/'.$subDir.'/'.$attachment);
                 }
             } else if (in_array($attachmentType, [self::ATTACHMENT_TYPE_OTHER, self::ATTACHMENT_TYPE_AUDIO])) {
-                copy($tmpFilesDir.'/'.$attachment, $entryAttachmentsDir.'/'.$attachment);
+                copy($tmpFilesDir.'/'.$attachment, $attachmentsDir.'/'.$attachment);
             }
         }
     }
@@ -159,6 +153,16 @@ class Entry extends \ActiveEntity
     
     public static function getAttachmentOriginalName($attachment) {
         return mb_substr($attachment, 14, null, 'UTF-8');
+    }
+    
+    public static function resizeAttachedImage($imagePath, $destinationPath, $width, $height) {
+        try {
+            $file = \PhpThumb\Factory::create($imagePath, ['resizeUp' => false]);
+            $file->resize($width, $height);
+            $file->save($destinationPath);
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage());
+        }
     }
     
     public function getTags() {

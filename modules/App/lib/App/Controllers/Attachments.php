@@ -12,47 +12,15 @@ class Attachments extends BasePrivate {
         $this->cloudAPI = new \CloudMailruAPI($config['login'], $config['password']);
     }
     
-    public function show_attachment_preview() {
-        $width = 500;
-        $height = 500;
-        $route = \Bingo\Routing::$route;
-        $baseDir = $route['base_dir'];
-        $subDir = $route['sub_dir'];
-        $filename = $route['filename'];
-        $filePath = INDEX_DIR.'/'.$baseDir.($subDir ? '/'.$subDir : '').'/'.$filename;
+    public function show_resized_image($path) {
+        $previewPath = INDEX_DIR.'/'.$path;
+        if (!file_exists($previewPath)) return;
         
-        $previewDir = INDEX_DIR.'/'.$baseDir.($subDir ? '/'.$subDir : '').'/preview/';
-        $previewPath = $previewDir.'/'.$filename;
-        
-        if (!is_dir($previewDir)) @mkdir($previewDir, $mode = 0700, $recursive = true);
-        if (is_file($filePath)) {
-            if (!file_exists($previewPath)) {
-                try {
-                    $file = \PhpThumb\Factory::create($filePath, ['resizeUp' => false]);
-                    $file->resize($width, $height);
-                    $file->save($previewPath);
-                } catch (\Exception $e) {
-                    trigger_error($e->getMessage());
-                    return;
-                }
-            }
-            
-            $previewInfo = getimagesize($previewPath);
-            $mimeInfo = isset($previewInfo['mime']) ? $previewInfo['mime'] : null;
+        $previewInfo = getimagesize($previewPath);
+        $mimeInfo = isset($previewInfo['mime']) ? $previewInfo['mime'] : null;
 
-            header("Content-type: $mimeInfo");
-            readfile($previewPath);
-        }
-    }
-    
-    public function show_resized_image($entryId, $filename) {
-        $imagePath = INDEX_DIR.'/entry_attachments/'.$entryId.'/'.$filename;
-        if (!file_exists($imagePath)) return;
-        
-        $imageInfo = getimagesize($imagePath);
-        $mimeInfo = isset($imageInfo['mime']) ? $imageInfo['mime'] : null;
         header("Content-type: $mimeInfo");
-        readfile($imagePath);
+        readfile($previewPath);
     }
     
     public function show_original_image($entryId, $filename) {
@@ -78,30 +46,30 @@ class Attachments extends BasePrivate {
     
     public function show_video_thumb($entryId, $videoName) {
         if (!$entryId || !$videoName) return; 
-        $videoThumbDir = INDEX_DIR.'/entry_attachments/'.$entryId.'/video_thumb';
-        $videoThumbPath = $videoThumbDir.'/'.str_replace('.', '_', $videoName).'.jpg';
+        $videoThumbsDir = INDEX_DIR.'/entry_attachments/'.$entryId.'/video_thumbs';
+        $videoThumbsPath = $videoThumbsDir.'/'.str_replace('.', '_', $videoName).'.jpg';
         
-        if (!is_dir($videoThumbDir)) 
-            mkdir($videoThumbDir, $mode = 0700, $recursive = true);
+        if (!is_dir($videoThumbsDir)) 
+            mkdir($videoThumbsDir, $mode = 0755, $recursive = true);
         
-        if (!file_exists($videoThumbPath)) {
+        if (!file_exists($videoThumbsPath)) {
             try {
-                $file = fopen($videoThumbPath, "w");
+                $file = fopen($videoThumbsPath, "w");
                 fwrite($file, $this->cloudAPI->getVideoThumb(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName));
                 fclose($file);
             } catch (\Exception $e) {
                 // can't get video thumb or thumb isn't uploaded to storage yet
-                unlink($videoThumbPath);
+                unlink($videoThumbsPath);
             }
         }
         
-        if (!file_exists($videoThumbPath))
-            $videoThumbPath = INDEX_DIR . '/assets/images/video-thumb.jpg';
+        if (!file_exists($videoThumbsPath))
+            $videoThumbsPath = INDEX_DIR . '/assets/images/video-thumb.jpg';
             
-        $thumbInfo = getimagesize($videoThumbPath);
+        $thumbInfo = getimagesize($videoThumbsPath);
         $mimeInfo = isset($thumbInfo['mime']) ? $thumbInfo['mime'] : null;
         header("Content-type: $mimeInfo");
-        readfile($videoThumbPath);
+        readfile($videoThumbsPath);
     }
     
     public function video_bitrate_list($entryId, $videoName) {
@@ -195,8 +163,8 @@ class Attachments extends BasePrivate {
     
     public function upload() {
         $tmpFilesDir = INDEX_DIR.'/tmp_files';
-        if (!file_exists($tmpFilesDir)) mkdir($tmpFilesDir, 0700);
-        if (!file_exists($tmpFilesDir.'/preview')) mkdir($tmpFilesDir.'/preview', 0700);
+        $tmpImgsPreviewDir = $tmpFilesDir.'/images_preview';
+        $tmpResizedImgsDir = $tmpFilesDir.'/resized_images';
         
         $removeExpiredFiles = function($dir) {
             $tmpFiles = array_diff(scandir($dir), ['.', '..']);
@@ -206,8 +174,11 @@ class Attachments extends BasePrivate {
                     @unlink($dir."/".$filename);
             }
         };
-        $removeExpiredFiles($tmpFilesDir);
-        $removeExpiredFiles($tmpFilesDir.'/preview');
+        
+        foreach ([$tmpFilesDir, $tmpImgsPreviewDir, $tmpResizedImgsDir] as $dir) {
+            if (!file_exists($dir)) mkdir($dir, 0755);
+            $removeExpiredFiles($dir);
+        }
         
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
             $filename = uniqid().'_'.$_FILES['attachment']['name'];
@@ -218,7 +189,9 @@ class Attachments extends BasePrivate {
             $previewUrl = '';
             $attachmentType = Entry::getAttachmentType($filename);
             if ($attachmentType == Entry::ATTACHMENT_TYPE_IMAGE) {
-                $previewUrl = url('attachments/show-preview/'.rawurlencode($filename));
+                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpImgsPreviewDir.'/'.$filename, 500, 500); //generate preview
+                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1280, 950); //generate resized copy
+                $previewUrl = url('attachments/show-attachment-preview/tmp_files/images_preview/'.rawurlencode($filename));
             } elseif ($attachmentType == Entry::ATTACHMENT_TYPE_VIDEO) {
                 $previewUrl = url('assets/images/video-thumb.jpg');
             }
