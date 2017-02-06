@@ -155,7 +155,7 @@ a {
 }
 
 .btn {
-    padding: 7px 16px 8px;
+    padding: 7px 16px;
     margin: 0;
     font-size: 12.5px;
     display: inline-block;
@@ -230,7 +230,7 @@ span.error {
     background-position: right 0;
     margin: 20px 0 0 9px;
     width: 8px;
-    height: 4px;
+    height: 5px;
     opacity: 0.55;
     display: inline-block;
 }
@@ -485,7 +485,7 @@ form.entry-form .prev-controls .col {
 form.entry-form .prev-controls .col {
     margin: 0 10px;
 }
-form.entry-form .prev-controls .col .target-height {
+form.entry-form .prev-controls .col .range-control {
     display: block;
 }
 form.entry-form .media-prev > div {
@@ -556,6 +556,7 @@ form.entry-form .add-attachment {
     font-size: 13px;
     padding-left: 27px;
     line-height: 22px;
+    margin-top: 4px;
 }
 form.entry-form .add-attachment:before {
     position: absolute;
@@ -576,6 +577,10 @@ form.entry-form .media-prev span.remove {
     height: 15px;
     background-color: rgba(0,0,0,0.5);
     cursor: pointer;
+}
+form.entry-form .media-prev.limited .hidden {
+    display: block;
+    opacity: 0.5;
 }
 form.entry-form .media-prev span.remove:after {
     content: '';
@@ -692,7 +697,7 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 }
 
 .entry.loading:before, .add-entry.loading:before,
-.media-prev.loading:before, .load-more.loading:before {
+.media-prev:before, .load-more.loading:before {
     content: '';
     position: absolute;
     top: 0;
@@ -703,13 +708,20 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     z-index: 15;
     pointer-events: none;
 }
-.media-prev.loading:before,
+.media-prev:before,
 .load-more.loading:before {
     background-size: 70px;
+}
+.media-prev.inited > div {
+    visibility: visible;
 }
 .media-prev {
     position: relative;
     padding-left: 4px;
+    min-height: 60px;
+}
+.media-prev.inited {
+    min-height: auto;
 }
 .media-prev:empty + .without-prev:empty + .upload-statuses:empty + .buttons {
     padding: 0;
@@ -719,8 +731,28 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 .media-prev a {
     position: relative;
     overflow:hidden;
+    display: block;
+    line-height: 0;
 }
-.media-prev.loading,
+.media-prev.inited:before,
+.media-prev + .show-all-attachments,
+.media-prev + .show-all-attachments .hide-all,
+.media-prev + .show-all-attachments.shown .show-all,
+.media-prev .item.hidden,
+.upload-statuses:empty, .without-prev:empty, .media-prev:empty,
+.entry-list .load-more.loading a,
+.upload-statuses .item.hidden {
+    display: none;
+}
+.media-prev.limited + .show-all-attachments,
+.media-prev + .show-all-attachments.shown {
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+}
+.media-prev + .show-all-attachments.shown .hide-all {
+    display: inline;
+}
 .load-more.loading {
     position: relative;
     padding-bottom: 60px;
@@ -752,12 +784,8 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     -webkit-transition: none;
     -moz-transition: none;
 }
-.media-prev .item.hidden,
-.media-prev.loading > div {
+.media-prev > div {
     visibility: hidden;
-}
-.upload-statuses:empty, .without-prev:empty, .media-prev:empty {
-    display: none;
 }
 .without-prev, .upload-statuses, .media-prev {
     margin-top: 15px;
@@ -765,8 +793,8 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     overflow: hidden;
 }
 .media-prev,
-.media-prev:empty + .without-prev,
-.media-prev:empty + .without-prev:empty + .upload-statuses {
+.media-prev:empty ~ .without-prev,
+.media-prev:empty ~ .without-prev:empty ~ .upload-statuses {
     margin: 0;
 }
 .without-prev a {
@@ -787,18 +815,11 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 .without-prev div:last-child {
     margin: 0;
 }
-.upload-statuses .item.hidden {
-    display: none;
-}
-
 .entry-list .load-more {
     text-align: center;
 }
 .entry-list .load-more a {
     margin: 10px 0 0;
-}
-.entry-list .load-more.loading a {
-    display: none;
 }
 
 .login .auth-block {

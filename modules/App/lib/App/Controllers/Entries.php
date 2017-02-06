@@ -17,8 +17,9 @@ class Entries extends BasePrivate {
                     $entry->text = !empty($_POST['text']) ? strip_tags($_POST['text']) : '';
                     $entry->attachments = !empty($_POST['attachments']) ? $_POST['attachments'] : [];
                     $entry->attachment_preview_settings = [
-                        'first_row_height_percent' => $_POST['first_row_height_percent'],
-                        'secondary_rows_height_percent' => $_POST['secondary_rows_height_percent']
+                        'first_row_height_percent' => isset($_POST['first_row_height_percent']) ? $_POST['first_row_height_percent'] : 20,
+                        'secondary_rows_height_percent' => isset($_POST['secondary_rows_height_percent']) ? $_POST['secondary_rows_height_percent'] : 10,
+                        'visible_row_count' => isset($_POST['visible_row_count']) ? $_POST['visible_row_count'] : 2
                     ];
                     $entry->author = $this->user;
                     $entry->save();

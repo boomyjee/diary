@@ -8,7 +8,8 @@ $(function() {
                 collage(
                     mediaPrevEl, 
                     form.find('input[name=first_row_height_percent]').val(), 
-                    form.find('input[name=secondary_rows_height_percent]').val()
+                    form.find('input[name=secondary_rows_height_percent]').val(),
+                    form.find('input[name=visible_row_count]').val()
                 );
             }
         });
@@ -43,10 +44,10 @@ $(function() {
                         if (result.status != 'success') {
                             data.context.addClass('error');
                         } else {
-                            attachmentBlock.empty().append($('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename})).addClass('hidden');
                             if (result.preview_url) {
                                 var preview = $('<img>', {'src': result.preview_url});
                                 $('<img/>').load(function() {
+                                    attachmentBlock.empty().append($('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename})).css({'visibility': 'hidden'});
                                     var mediaPreviewsBlock = attachmentBlock.parents('.entry-form').find('.media-prev');
                                     attachmentBlock.append(preview, $('<span>', {'class': 'remove'}));
                                     attachmentBlock.appendTo(mediaPreviewsBlock);
@@ -55,11 +56,13 @@ $(function() {
                                     collage(
                                         mediaPreviewsBlock, 
                                         form.find('input[name=first_row_height_percent]').val(), 
-                                        form.find('input[name=secondary_rows_height_percent]').val()
+                                        form.find('input[name=secondary_rows_height_percent]').val(),
+                                        form.find('input[name=visible_row_count]').val()
                                     );
                                 }).attr('src', preview.attr('src'));
                             } else {
-                                attachmentBlock.append(
+                                attachmentBlock.empty().append(
+                                    $('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename}),
                                     $('<p>').text(result.original_filename),
                                     $('<span>', {'class': 'remove'})
                                 );
@@ -108,7 +111,12 @@ $(function() {
         });
         
         elem.find('.attachments .media-prev').each(function() {
-            collage($(this), $(this).attr('data-first-row-height-percent'), $(this).attr('data-secondary-rows-height-percent'));
+            collage(
+                $(this),
+                $(this).attr('data-first-row-height-percent'), 
+                $(this).attr('data-secondary-rows-height-percent'), 
+                $(this).attr('data-visible-row-count')
+            );
         });
         
         elem.find('.media-prev').each(function() {
@@ -121,7 +129,7 @@ $(function() {
         autosize(elem.find('.entry-form textarea'));
     };
     
-    function collage(elem, firstRowHeightPercent, secondaryRowsHeightPercent) {
+    function collage(elem, firstRowHeightPercent, secondaryRowsHeightPercent, visibleRowCount) {
         var container = $(elem);
         var imgs = $(elem).find('img');
         var imgCount = imgs.length;
@@ -133,7 +141,8 @@ $(function() {
                 if(++counter === imgCount) {
                     container.collagePlusPlus({
                         'firstRowTargetHeight': firstRowHeightPercent * container.width() / 100,
-                        'secondaryRowsTargetHeight': secondaryRowsHeightPercent * container.width() / 100
+                        'secondaryRowsTargetHeight': secondaryRowsHeightPercent * container.width() / 100,
+                        'visibleRowCount': visibleRowCount
                     });
                 }
             }).attr('src', img.attr('src'));
@@ -149,13 +158,15 @@ $(function() {
             $('.media-prev:visible').each(function() {
                 var firstRowHeightPercent = $(this).attr('data-first-row-height-percent');
                 var secondaryRowsHeightPercent = $(this).attr('data-secondary-rows-height-percent');
+                var visibleRowCount = $(this).siblings('.show-all-attachments').is(':not(.shown)') ? $(this).attr('data-visible-row-count') : false;
                 
                 if ($(this).parents('.entry-form').length) {
-                    var from = $(this).parents('.entry-form');
-                    firstRowHeightPercent = from.find('input[name=first_row_height_percent]').val();
-                    secondaryRowsHeightPercent = from.find('input[name=secondary_rows_height_percent]').val();
+                    var form = $(this).parents('.entry-form');
+                    firstRowHeightPercent = form.find('input[name=first_row_height_percent]').val();
+                    secondaryRowsHeightPercent = form.find('input[name=secondary_rows_height_percent]').val();
+                    visibleRowCount = form.find('input[name=visible_row_count]').val();
                 }
-                collage($(this), firstRowHeightPercent, secondaryRowsHeightPercent);
+                collage($(this), firstRowHeightPercent, secondaryRowsHeightPercent, visibleRowCount);
             });
         }, 50);
     });
@@ -177,7 +188,8 @@ $(function() {
         collage(
             form.find('.media-prev'), 
             form.find('input[name=first_row_height_percent]').val(), 
-            form.find('input[name=secondary_rows_height_percent]').val()
+            form.find('input[name=secondary_rows_height_percent]').val(),
+            form.find('input[name=visible_row_count]').val()
         );
         if (!form.find('.media-prev *').length)
             form.removeClass('media-added');
@@ -191,7 +203,8 @@ $(function() {
         collage(
             form.find('.media-prev'), 
             form.find('input[name=first_row_height_percent]').val(), 
-            form.find('input[name=secondary_rows_height_percent]').val()
+            form.find('input[name=secondary_rows_height_percent]').val(),
+            form.find('input[name=visible_row_count]').val()
         );
         autosize.update(form.find('textarea'));
     });
@@ -203,7 +216,8 @@ $(function() {
         collage(
             mediaPrevEl, 
             mediaPrevEl.attr('data-first-row-height-percent'), 
-            mediaPrevEl.attr('data-secondary-rows-height-percent')
+            mediaPrevEl.attr('data-secondary-rows-height-percent'),
+            mediaPrevEl.siblings('.show-all-attachments').is(':not(.shown)') ? mediaPrevEl.attr('data-visible-row-count') : false
         );
     });
     
@@ -282,6 +296,19 @@ $(function() {
         $('#search input').val($(this).text()).trigger('input');
     });
     
+    $(document).on('click', '.show-all-attachments a', function(e) {
+        e.preventDefault();
+        $(this).parent().toggleClass('shown');
+        var entryEl = $(this).parents('.entry');
+        var mediaPrevEl = entryEl.find('.attachments .media-prev');
+        collage(
+            mediaPrevEl, 
+            mediaPrevEl.attr('data-first-row-height-percent'), 
+            mediaPrevEl.attr('data-secondary-rows-height-percent'),
+            $(this).is('.show-all') ? false : mediaPrevEl.attr('data-visible-row-count')
+        );
+    });
+    
     $(document).on('focus', '.add-entry textarea', function() {
         $(this).parents('.add-entry').addClass('full');
     });
@@ -297,7 +324,7 @@ $(function() {
     });
     
     var resizeTimeout;
-    $(document).on('input', '.target-height', function(e) {
+    $(document).on('input', '.range-control', function(e) {
         e.preventDefault();
         var form = $(this).parents('.entry-form');
         clearTimeout(resizeTimeout);
@@ -306,7 +333,8 @@ $(function() {
             collage(
                 form.find('.media-prev'), 
                 form.find('input[name=first_row_height_percent]').val(), 
-                form.find('input[name=secondary_rows_height_percent]').val()
+                form.find('input[name=secondary_rows_height_percent]').val(),
+                form.find('input[name=visible_row_count]').val()
             );
         }, 10);
     });

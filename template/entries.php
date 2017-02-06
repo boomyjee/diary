@@ -28,8 +28,9 @@
 
                         <div class="controls">
                             <div class="prev-controls">
-                                <div class="col"><input class="target-height" name="first_row_height_percent" type="range" min="10" max="100" step="1" value="40"> </div>
-                                <div class="col"><input class="target-height" name="secondary_rows_height_percent" type="range" min="10" max="100" step="1" value="20"></div>
+                                <div class="col"><input class="range-control" name="first_row_height_percent" type="range" min="10" max="100" step="1" value="40"> </div>
+                                <div class="col"><input class="range-control" name="secondary_rows_height_percent" type="range" min="10" max="100" step="1" value="20"></div>
+                                <div class="col"><input class="range-control" name="visible_row_count" type="range" min="1" max="10" step="1" value="2"></div>
                             </div>
                             <div class="media-prev"></div>
                             <div class="without-prev"></div>
@@ -53,8 +54,9 @@
                                 </div>
                                 <div class="controls">
                                     <div class="prev-controls">
-                                        <div class="col"><input class="target-height" name="first_row_height_percent" type="range" min="10" max="100" step="1" value="<?= $entry->attachment_preview_settings['first_row_height_percent'] ?>"> </div>
-                                        <div class="col"><input class="target-height" name="secondary_rows_height_percent" type="range" min="10" max="100" step="1" value="<?= $entry->attachment_preview_settings['secondary_rows_height_percent'] ?>"></div>
+                                        <div class="col"><input class="range-control" name="first_row_height_percent" type="range" min="10" max="100" step="1" value="<?= $entry->attachment_preview_settings['first_row_height_percent'] ?>"> </div>
+                                        <div class="col"><input class="range-control" name="secondary_rows_height_percent" type="range" min="10" max="100" step="1" value="<?= $entry->attachment_preview_settings['secondary_rows_height_percent'] ?>"></div>
+                                        <div class="col"><input class="range-control" name="visible_row_count" type="range" min="1" max="10" step="1" value="<?= $entry->attachment_preview_settings['visible_row_count'] ?>"></div>
                                     </div>
                                     <div class="media-prev">
                                         <? $withoutPreview = []; ?>
@@ -115,6 +117,7 @@
                                         <div class="media-prev"
                                              data-first-row-height-percent="<?= $entry->attachment_preview_settings['first_row_height_percent'] ?>"
                                              data-secondary-rows-height-percent="<?= $entry->attachment_preview_settings['secondary_rows_height_percent'] ?>"
+                                             data-visible-row-count="<?= $entry->attachment_preview_settings['visible_row_count'] ?>"
                                          >
                                             <? $withoutPreview = []; ?>
                                             <? foreach ($entry->attachments as $attachment): ?>
@@ -138,6 +141,10 @@
                                                     <? $withoutPreview[] = $attachment; ?>
                                                 <? endif ?>
                                             <? endforeach ?>
+                                        </div>
+                                        <div class="show-all-attachments">
+                                            <a href="#" class="show-all">Показать все</a>
+                                            <a href="#" class="hide-all">Спрятать</a>
                                         </div>
                                         <div class="without-prev">
                                             <? foreach ($withoutPreview as $attachment): ?>

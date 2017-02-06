@@ -11,9 +11,9 @@
              */
 
             // track row width by adding images, padding and css borders etc
-            var row         = 0,
+            var row = 0,
             // collect elements to be re-sized in current row
-                elements    = [],
+                elements = [],
             // track the number of rows generated
                 rownum = 1,
             // needed for creating some additional defaults that are actually obtained
@@ -32,8 +32,8 @@
             var settings = $.extend({}, $.fn.collagePlusPlus.defaults, options);
             
             settings.images.each(
-                function(index){
-
+                function(index){                  
+                    
                     /*
                      *
                      * Cache selector
@@ -117,8 +117,7 @@
                     if ( row > settings.albumWidth && elements.length != 0 ){
 
                         // call the method that calculates the final image sizes
-                        // remove one set of padding as it's not needed for the last image in the row
-                        resizeRow(elements, (row - settings.padding), settings, rownum, rowOffsetTop);
+                        resizeRow(elements, row, settings, rownum, rowOffsetTop);
 
                         // reset our row
                         delete row;
@@ -126,7 +125,7 @@
                         row         = 0;
                         elements    = [];
                         rownum      += 1;
-                        rowOffsetTop += $this.height() + settings.padding;
+                        rowOffsetTop += $this.is(':visible') ? ($this.height() + settings.padding) : 0;
                         $this.parent().height(rowOffsetTop);
                     }
 
@@ -146,9 +145,12 @@
                         row         = 0;
                         elements    = [];
                         rownum      += 1;
-                        rowOffsetTop += $this.height();
+                        rowOffsetTop += $this.is(':visible') ? $this.height() : 0;
                         $this.parent().height(rowOffsetTop);
                     }
+                    
+                    if (index == settings.images.length - 1)
+                        $this.parent().addClass('inited');
                 }
             );
         });
@@ -170,7 +172,7 @@
              * need to scale the images.
              *
              */
-            var imageExtras         = (settings.padding * (obj.length - 1)) + (obj.length * obj[0][3]),
+            var imageExtras         = (settings.padding * (obj.length - 2)) + (obj.length * obj[0][3]),
                 albumWidthAdjusted  = settings.albumWidth - imageExtras,
                 overPercent         = albumWidthAdjusted / (row - imageExtras),
                 // start tracking our width with know values that will make up the total width
@@ -180,9 +182,6 @@
                 // than the parent width.
                 lastRow             = (row < settings.albumWidth  ? true : false),
                 imageOffsetLeft     = 0;
-
-
-
 
             /*
              * Resize the images by the above % so that they'll fit in the album space
@@ -195,6 +194,14 @@
                     fw          = Math.floor(obj[i][1] * overPercent),
                     fh          = Math.floor(obj[i][2] * overPercent),
                     isNotLast   = !!(( i < obj.length - 1 ));
+                
+                if (settings.visibleRowCount && rownum > settings.visibleRowCount) {
+                    $obj.parent().addClass('limited');
+                    $obj.addClass('hidden');
+                } else {
+                    $obj.parent().removeClass('limited');
+                    $obj.removeClass('hidden');
+                }
 
                 /*
                  * Checking if the user wants to not stretch the images of the last row to fit the
@@ -276,8 +283,8 @@
                  * Set image position
                  *
                  */
-                $obj.css({'top': rowOffsetTop, 'left': imageOffsetLeft}).removeClass('hidden');
-                imageOffsetLeft += $obj.width() + settings.padding;
+                $obj.css({'top': rowOffsetTop, 'left': imageOffsetLeft, 'visibility': 'visible'});
+                imageOffsetLeft += $obj.is(':visible') ? ($obj.width() + settings.padding) : 0;
             }
         }
 
@@ -306,7 +313,9 @@
         'secondaryRowsTargetHeight': 400,
         // Sometimes there is just one image on the last row and it gets blown up to a huge size to fit the
         // parent div width. To stop this behaviour, set this to true
-        'allowPartialLastRow': false
+        'allowPartialLastRow': false,
+        // Set for visible images limitation
+        'visibleRowCount': false
     };
 
 })( jQuery );
