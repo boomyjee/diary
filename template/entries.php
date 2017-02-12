@@ -64,13 +64,13 @@
                                             <? $attachmentType = \App\Models\Entry::getAttachmentType($attachment); ?>
                                             <? if ($attachmentType == \App\Models\Entry::ATTACHMENT_TYPE_IMAGE): ?>
                                                 <div class="item">
-                                                    <img src="<?= url('attachments/show-attachment-preview/entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
+                                                    <img src="<?= url('entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
                                                     <input type="hidden" name="attachments[]" value="<?= $attachment ?>">
                                                     <span class="remove"></span>
                                                 </div>
                                             <? elseif ($attachmentType == \App\Models\Entry::ATTACHMENT_TYPE_VIDEO): ?>
                                                 <div class="item video">
-                                                    <img src="<?= url('attachments/show-video-thumb/'.$entry->id.'/'.rawurlencode($attachment)) ?>">
+                                                    <img src="<?= url('entry_attachments/'.$entry->id.'/video_thumbs/'.rawurlencode($attachment)) ?>">
                                                     <input type="hidden" name="attachments[]" value="<?= $attachment ?>">
                                                     <span class="remove"></span>
                                                 </div>
@@ -126,14 +126,14 @@
                                                     <div class="item">
                                                         <a class="fancybox" 
                                                            data-original-url="<?= url('attachments/show-original-image/'.$entry->id.'/'.rawurlencode($attachment)) ?>" 
-                                                           data-fancybox-group="<?= $entry->id ?>" href="<?= url('attachments/show-resized-image/entry_attachments/'.$entry->id.'/resized_images/'.rawurlencode($attachment)) ?>">
-                                                            <img class="" src="<?= url('attachments/show-attachment-preview/entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
+                                                           data-fancybox-group="<?= $entry->id ?>" href="<?= url('entry_attachments/'.$entry->id.'/resized_images/'.rawurlencode($attachment)) ?>">
+                                                            <img class="" src="<?= url('entry_attachments/'.$entry->id.'/images_preview/'.rawurlencode($attachment)) ?>">
                                                         </a>
                                                     </div>
                                                 <? elseif ($attachmentType == \App\Models\Entry::ATTACHMENT_TYPE_VIDEO): ?>
                                                     <div class="item">
                                                         <a class="open-video" href="#" id="<?= md5($attachment) ?>">
-                                                            <img src="<?= url('attachments/show-video-thumb/'.$entry->id.'/'.rawurlencode($attachment)) ?>">
+                                                            <img src="<?= url('entry_attachments/'.$entry->id.'/video_thumbs/'.rawurlencode($attachment)) ?>">
                                                         </a>
                                                         <div class="player" data-trigger="<?= md5($attachment) ?>" data-url="<?= url('attachments/'.$entry->id.'/'.rawurlencode($attachment).'/bitrates.m3u8') ?>"></div>
                                                     </div>
@@ -152,12 +152,12 @@
                                                 <? if (\App\Models\Entry::getAttachmentType($attachment) == \App\Models\Entry::ATTACHMENT_TYPE_AUDIO): ?>
                                                     <div class="audio">
                                                         <audio controls="true" preload="none">
-                                                            <source src="<?= url('attachments/play-audio/'.$entry->id.'/'.rawurlencode($attachment)) ?>" type="audio/mpeg">
+                                                            <source src="<?= url('entry_attachments/'.$entry->id.'/'.rawurlencode($attachment)) ?>" type="audio/mpeg">
                                                         </audio>
                                                         <span><?= $originalName ?></span>
                                                     </div>
                                                 <? else: ?>
-                                                    <a href="<?= url('attachments/download/'.$entry->id.'/'.rawurlencode($attachment)) ?>"><?= $originalName ?></a>
+                                                    <a href="<?= url('entry_attachments/'.$entry->id.'/'.rawurlencode($attachment)) ?>"><?= $originalName ?></a>
                                                 <? endif ?>
                                             <? endforeach ?>
                                         </div>

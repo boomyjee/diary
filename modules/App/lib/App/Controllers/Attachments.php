@@ -12,17 +12,6 @@ class Attachments extends BasePrivate {
         $this->cloudAPI = new \CloudMailruAPI($config['login'], $config['password']);
     }
     
-    public function show_resized_image($path) {
-        $previewPath = INDEX_DIR.'/'.$path;
-        if (!file_exists($previewPath)) return;
-        
-        $previewInfo = getimagesize($previewPath);
-        $mimeInfo = isset($previewInfo['mime']) ? $previewInfo['mime'] : null;
-
-        header("Content-type: $mimeInfo");
-        readfile($previewPath);
-    }
-    
     public function show_original_image($entryId, $filename) {
         if (!$entryId || !$filename) return;
         $imagePath = Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$filename;
@@ -69,6 +58,7 @@ class Attachments extends BasePrivate {
         $thumbInfo = getimagesize($videoThumbsPath);
         $mimeInfo = isset($thumbInfo['mime']) ? $thumbInfo['mime'] : null;
         header("Content-type: $mimeInfo");
+        header('Cache-Control: max-age=3600');
         readfile($videoThumbsPath);
     }
     
@@ -108,59 +98,6 @@ class Attachments extends BasePrivate {
         }
     }
     
-    public function play_audio($entryId, $audioName) {
-        $file = INDEX_DIR.'/entry_attachments/'.$entryId.'/'.$audioName;
-        $fp = @fopen($file, 'rb');
-        $size = filesize($file); 
-        $length = $size;
-        $start = 0;
-        $end = $size - 1;
-        header('Content-type: audio/mpeg');
-        header("Accept-Ranges: bytes");
-        if (isset($_SERVER['HTTP_RANGE'])) {
-            $c_start = $start;
-            $c_end = $end;
-            list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
-            if (strpos($range, ',') !== false) {
-                header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header("Content-Range: bytes $start-$end/$size");
-                exit;
-            }
-
-            if ($range == '-') {
-                $c_start = $size - substr($range, 1);
-            }else{
-                $range = explode('-', $range);
-                $c_start = $range[0];
-                $c_end = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size;
-            }
-            $c_end = ($c_end > $end) ? $end : $c_end;
-
-            if ($c_start > $c_end || $c_start > $size - 1 || $c_end >= $size) {
-                header('HTTP/1.1 416 Requested Range Not Satisfiable');
-                header("Content-Range: bytes $start-$end/$size");
-                exit;
-            }
-            $start = $c_start;
-            $end = $c_end;
-            $length = $end - $start + 1;
-            fseek($fp, $start);
-            header('HTTP/1.1 206 Partial Content');
-        }
-        header("Content-Range: bytes $start-$end/$size");
-        header("Content-Length: ".$length);
-        $buffer = 1024 * 8;
-        while(!feof($fp) && ($p = ftell($fp)) <= $end) {
-            if ($p + $buffer > $end) {
-                $buffer = $end - $p + 1;
-            }
-            set_time_limit(0);
-            echo fread($fp, $buffer);
-            flush();
-        }
-        fclose($fp);
-    }
-    
     public function upload() {
         $tmpFilesDir = INDEX_DIR.'/tmp_files';
         $tmpImgsPreviewDir = $tmpFilesDir.'/images_preview';
@@ -197,26 +134,6 @@ class Attachments extends BasePrivate {
             }
             
             echo json_encode(['status' => 'success', 'original_filename' => Entry::getAttachmentOriginalName($filename), 'filename' => $filename, 'preview_url' => $previewUrl]);
-        }
-    }
-    
-    public function download($entryId, $filename) {
-        if (!$entryId || !$filename) return;        
-        $cloudFilePath = Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$filename;
-        $localFilePath = INDEX_DIR.'/entry_attachments/'.$entryId.'/'.$filename;
-        
-        header('Content-Disposition: attachment; filename="' . Entry::getAttachmentOriginalName($filename) . '"');
-        header('Content-Transfer-Encoding: binary');
-        header('Accept-Ranges: bytes');
-        
-        if (file_exists($localFilePath)) {
-            readfile($localFilePath);
-        } else {
-            try {
-                echo $this->cloudAPI->getFileContent($cloudFilePath);
-            } catch (\Exception $e) {
-                trigger_error($e->getMessage());
-            }
         }
     }
 }

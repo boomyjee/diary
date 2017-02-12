@@ -22,6 +22,7 @@ class App extends \Bingo\Module {
         $this->connect('attachments/show-attachment-preview/*any', ['controller' => 'App\Controllers\Attachments', 'action' => 'show-resized-image']);
         $this->connect('attachments/show-resized-image/*any', ['controller' => 'App\Controllers\Attachments', 'action' => 'show-resized-image']);
         
+        $this->connect('entry_attachments/:entry_id/video_thumbs/:video_name', ['controller' => 'App\Controllers\Attachments', 'action' => 'show-video-thumb']);
         $this->connect('video-part-list/*any', ['controller' => 'App\Controllers\Attachments', 'action' => 'video-part-list']);
         $this->connect('play-video/*any', ['controller' => 'App\Controllers\Attachments', 'action' => 'play-video']);
         
