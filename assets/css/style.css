@@ -209,19 +209,17 @@ span.error {
     display: block;
     outline: none;
 }
-#header .dropdown .main-point:active,
-#header .dropdown .main-point:focus {
+#header .dropdown:hover {
     background-color: #2d2d2d;
     outline: none;
 }
 #header .dropdown .main-point ~ .sub-menu { 
     display: none; 
     position: absolute;
-    top: 35px;
+    top: 29px;
     right: 0;
 } 
-#header .dropdown .main-point:focus ~ .sub-menu, 
-#header .dropdown .main-point:active ~ .sub-menu, 
+#header .dropdown .main-point:hover ~ .sub-menu, 
 #header .dropdown .main-point ~ .sub-menu:hover { 
    display: block; 
 } 
@@ -301,8 +299,7 @@ span.error {
     padding: 20px 20px 10px;
 }
 .entry .entry-body {
-    padding: 0 20px 20px;
-    overflow: auto;
+    padding: 15px 20px 20px;
 }
 .entry .entry-body > p {
     line-height: 1.4;
@@ -316,18 +313,19 @@ span.error {
     color: #939393;
 }
 .entry .actions {
-    background: url(../images/entry_more.png) no-repeat right 10px;
-    position: absolute;
+    background: url(../images/entry_more.png) no-repeat center;
+    position: relative;
     width: 22px;
     height: 24px;
-    top: 15px;
-    right: 20px;
     cursor: pointer;
     outline: none;
+    float: right;
+    margin-top: -3px;
+    margin-bottom: 7px;
 }
 .entry .actions > ul,
 #header .dropdown > ul {
-    position: relative;
+    position: absolute;
     top: 10px;
     right: -13px;
     display: none;
@@ -351,7 +349,7 @@ span.error {
     height: 0;
     width: 0;
     bottom: 100%;
-    right: 20.5px;
+    right: 22.5px;
     border-width: 6px;
     margin: 0 -6px;
     border-bottom-color: #c5d0db;
@@ -381,10 +379,8 @@ span.error {
     text-decoration: none;
     background-color: #e4eaf0;
 }
-.entry .actions:hover {
-    width: auto;
-    height: auto;
-    cursor: auto;
+#header .dropdown > ul:before, #header .dropdown > ul:after {
+    right: 30.5px;
 }
 .entry .actions:hover > ul {
    display: block;
@@ -422,7 +418,6 @@ span.error {
 .entry .entry-content, 
 .entry.editing form {
     display: block;
-    overflow: auto;
 }
 .entry .audio {
     display: block;
@@ -537,7 +532,7 @@ form.entry-form .without-prev div span {
     position: relative;
     cursor: pointer;
     float: left;
-    margin: 7px;
+    margin: 2px 0 0 7px;
 }
 form.entry-form .upload-statuses div span.remove,
 form.entry-form .upload-statuses div.working span,
@@ -749,6 +744,9 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     display: block;
     text-align: center;
     margin-top: 5px;
+}
+.media-prev + .show-all-attachments a img {
+    opacity: 0.2;
 }
 .media-prev + .show-all-attachments.shown .hide-all {
     display: inline;

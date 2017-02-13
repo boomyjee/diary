@@ -100,16 +100,13 @@
                             </form>
 
                             <div class="entry-content">
-                                <div class="entry-header">
-                                    <div class="entry-number">Запись #<?= $entry->id ?></div>
+                                <div class="entry-body">
                                     <div class="actions">
                                         <ul>
                                             <li class="edit">Редактировать запись</li>
                                             <li class="remove">Удалить запись</li>
                                         </ul>
                                     </div>
-                                </div>
-                                <div class="entry-body">
                                     <? $text = preg_replace('/#([\w|\p{L}]+)/u', '<a class="hash-tag" href="#">#\1</a>', nl2br($entry->text)) ?>
                                     <? $text = preg_replace('/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', '<a href="\0">\0</a>', $text) ?>
                                     <p><?= $text ?></p>
@@ -143,8 +140,8 @@
                                             <? endforeach ?>
                                         </div>
                                         <div class="show-all-attachments">
-                                            <a href="#" class="show-all">Показать все</a>
-                                            <a href="#" class="hide-all">Спрятать</a>
+                                            <a href="#" class="show-all"><img src="<?= url('assets/images/arrow_bottom.png') ?>" title="Показать все" /></a>
+                                            <a href="#" class="hide-all"><img src="<?= url('assets/images/arrow_top.png') ?>" title="Скрыть"/></a>
                                         </div>
                                         <div class="without-prev">
                                             <? foreach ($withoutPreview as $attachment): ?>

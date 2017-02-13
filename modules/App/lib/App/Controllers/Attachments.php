@@ -128,7 +128,7 @@ class Attachments extends BasePrivate {
             if ($attachmentType == Entry::ATTACHMENT_TYPE_IMAGE) {
                 \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpImgsPreviewDir.'/'.$filename, 500, 500); //generate preview
                 \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1280, 950); //generate resized copy
-                $previewUrl = url('attachments/show-attachment-preview/tmp_files/images_preview/'.rawurlencode($filename));
+                $previewUrl = url('tmp_files/images_preview/'.rawurlencode($filename));
             } elseif ($attachmentType == Entry::ATTACHMENT_TYPE_VIDEO) {
                 $previewUrl = url('assets/images/video-thumb.jpg');
             }

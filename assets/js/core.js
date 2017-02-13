@@ -226,19 +226,14 @@ $(function() {
 
         var entryEl = $(this).parents('.entry');
         var entryId = entryEl.find('input[name=entry_id]').val();
-        entryEl.addClass('loading');
-        $.post(location.href, {action: 'delete_entry', entry_id: entryId}, function(html) {
-            entryEl.removeClass('loading');
-            if (!html) return;
-            $('.entry-list').replaceWith($(html).find('.entry-list'));
-            bindPlugins($('.entry-list'));
-            $.get(base_url + 'sync-entries');
-        });
+        entryEl.remove();
+        $.post(location.href, {action: 'delete_entry', entry_id: entryId});
+        $.get(base_url + 'sync-entries');
     });
     
     $(document).on('submit', '.entry-form', function(e) {
         e.preventDefault();
-        if (!$(this).find('textarea').val() && !$(this).find('.media-prev div').length && !$(this).find('.without-prev div').length) {
+        if (!$(this).find('textarea').val() && !$(this).find('.media-prev div').length && !$(this).find('.without-prev div').length || $(this).find('.upload-statuses div').length) {
             return false;
         }
        
