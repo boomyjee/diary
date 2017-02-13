@@ -88,7 +88,7 @@ class Entry extends \ActiveEntity
         ];
         
         foreach ($directories as $dir) 
-            if (!file_exists($dir)) mkdir($dir, 0755);
+            if (!file_exists($dir)) mkdir($dir, 0755, true);
 
         foreach ($this->attachments as $attachment) {
             if (file_exists($attachmentsDir.'/'.$attachment)) continue;

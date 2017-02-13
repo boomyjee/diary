@@ -30,6 +30,7 @@ class App extends \Bingo\Module {
             ['action'=>'(user-list|user-edit)']
         );
         
+        $this->connect("developer/:action", ['controller' => 'App\Controllers\Developer']);
         $this->connect("sync-entries", ['controller' => 'App\Controllers\Cron', 'action' => 'sync-entries']);
         
         \Bingo\Action::add('admin_pre_header',
