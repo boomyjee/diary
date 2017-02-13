@@ -8,4 +8,7 @@ namespace App\Models;
 */
 class User extends \Auth\Models\User {
     
+    public function setPassword($password) {
+        $this->password = md5($password);
+    }
 }
