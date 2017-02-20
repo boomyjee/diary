@@ -49,8 +49,9 @@ class Entries extends Base {
         $limit = 20;
         $offset = ($this->getPage() - 1) * $limit;
         $query = Entry::getSearchQuery($entryId, $this->user, $searchText, $hashTags);
-        $total = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
         $entries = $query->setMaxResults($limit)->setFirstResult($offset)->getResult();
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($query);
+        $total = count($paginator);
         
         $this->data['search_criteria'] = $searchCriteria;
         $this->data['show_load_more_button'] = $offset + $limit < $total;

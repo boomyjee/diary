@@ -109,7 +109,7 @@ class Entry extends \ActiveEntity
     
     public static function getSearchQuery($id = false, $author = null, $text = '', $tags = []) {
         $qb = \Bingo::$em->createQueryBuilder()
-            ->select('e')
+            ->select('DISTINCT e')
             ->from('App\Models\Entry', 'e')
             ->where('e.deleted = false')
             ->add('orderBy','e.created DESC, e.id DESC');
@@ -130,9 +130,14 @@ class Entry extends \ActiveEntity
         }
         
         if (count($tags)) { 
-            $qb->andWhere("e.id IN (SELECT t.owner_id FROM \Meta\Models\Tag t WHERE t.type = :tag_type AND t.value IN (:tags))");
+            $qb->addSelect('COUNT(t.id) as HIDDEN tag_count');
+            $qb->join('Meta\Models\Tag', 't', 'WITH', 't.owner_id = e.id AND t.type = :tag_type');
+            $qb->andWhere('t.value IN (:tags)');
+            $qb->groupBy('e.id');
+            $qb->having('tag_count = :tag_count');
             $qb->setParameter('tags', $tags);
             $qb->setParameter('tag_type', static::class);
+            $qb->setParameter('tag_count', count($tags));
         }
         
         return $qb->getQuery();
