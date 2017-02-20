@@ -3,7 +3,11 @@
 namespace App\Controllers;
 
 class Auth extends Base {
-    
+    public function __construct() {
+        $this->checkUser = false;
+        parent::__construct();
+    }
+
     public function login() {
         if ($this->user) redirect('entries');
         

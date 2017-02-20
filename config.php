@@ -2,7 +2,7 @@
 
 $config = [
     'cloud_mailru' => [
-        'login' => 'zubrov.art',
-        'password' => 'zubranax85'
+        'login' => 'ms-lyubov0208@mail.ru',
+        'password' => 'j,kfrjaig15093'
     ]
 ];

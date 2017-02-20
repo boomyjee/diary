@@ -299,11 +299,11 @@ span.error {
     padding: 20px 20px 10px;
 }
 .entry .entry-body {
-    padding: 15px 20px 20px;
+    padding: 15px 20px;
 }
 .entry .entry-body > p {
     line-height: 1.4;
-    margin: 0 0 10px
+    margin: 0 0 0px
 }
 .entry .entry-body > p:empty {
     margin: 0;
@@ -385,6 +385,9 @@ span.error {
 .entry .actions:hover > ul {
    display: block;
 }
+.entry .attachments {
+    margin-top: 10px;
+}
 .entry .attachments .open-video:after,
 .entry-form .media-prev .item.video:after{
     content: '';
@@ -443,6 +446,7 @@ span.error {
 form.entry-form .textfield {
     display: block;
     padding: 10px;
+    overflow: hidden;
 }
 form.entry-form .textfield textarea {
     display: block;
@@ -450,7 +454,7 @@ form.entry-form .textfield textarea {
     overflow: auto;
     width: 100%;
     height: 50px;
-    padding: 14px 20px 16px 12px;
+    padding: 14px 12px;
     border: 0;
     border-radius: 2px;
     line-height: 1.4;
@@ -743,13 +747,16 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
 .media-prev + .show-all-attachments.shown {
     display: block;
     text-align: center;
-    margin-top: 5px;
+}
+.media-prev + .show-all-attachments a {
+    display: block;
+    padding-top: 10px;
 }
 .media-prev + .show-all-attachments a img {
     opacity: 0.2;
 }
 .media-prev + .show-all-attachments.shown .hide-all {
-    display: inline;
+    display: block;
 }
 .load-more.loading {
     position: relative;
@@ -867,7 +874,21 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     padding: 2px !important;
 }
 .fancybox-title.fancybox-title-float-wrap a {
-    color: #ccc;
+    color: #fff;
+}
+.fancybox-wrap .fancybox-title-float-wrap {
+    margin-bottom: -50px;
+}
+.fancybox-wrap .fancybox-title .img-number {
+    font-size: 12px;
+    font-weight: 300;
+}
+.fancybox-lock .fancybox-overlay {
+    overflow-x: hidden;
+}
+.fancybox-title-float-wrap .child {
+    line-height: 18px;
+    padding: 5px 20px;
 }
 
 @media (max-width: 480px) {

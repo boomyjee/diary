@@ -110,6 +110,7 @@
                                     <? $text = preg_replace('/#([\w|\p{L}]+)/u', '<a class="hash-tag" href="#">#\1</a>', nl2br($entry->text)) ?>
                                     <? $text = preg_replace('/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', '<a href="\0">\0</a>', $text) ?>
                                     <p><?= $text ?></p>
+                                    <? if (count($entry->attachments)): ?>
                                     <div class="attachments">
                                         <div class="media-prev"
                                              data-first-row-height-percent="<?= $entry->attachment_preview_settings['first_row_height_percent'] ?>"
@@ -159,6 +160,7 @@
                                             <? endforeach ?>
                                         </div>
                                     </div>
+                                    <? endif ?>
                                 </div>
                             </div>
                         </div>

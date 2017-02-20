@@ -112,7 +112,7 @@ class Entry extends \ActiveEntity
             ->select('e')
             ->from('App\Models\Entry', 'e')
             ->where('e.deleted = false')
-            ->orderBy('e.created', 'DESC');
+            ->add('orderBy','e.created DESC, e.id DESC');
         
         if ($id) {
             $qb->andWhere('e.id = :id');

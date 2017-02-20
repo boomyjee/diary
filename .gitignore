@@ -1,4 +1,3 @@
-/db.php
-/cache
-/entry_attachments
-/tmp_files
+db.php
+/public/cache
+/public/entry_attachments

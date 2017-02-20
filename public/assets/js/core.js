@@ -86,7 +86,7 @@ $(function() {
         
         elem.find('.fancybox').fancybox({
             afterLoad: function() {
-                this.title += '<a class="open-original" href="'+this.element.attr('data-original-url')+'" target="_blank">Открыть оригинал</a>';
+                this.title += '<span class="img-number">Картинка ' + (this.index + 1) + ' из ' + this.group.length + '</span><br>' + '<a class="open-original" href="'+this.element.attr('data-original-url')+'" target="_blank">Открыть оригинал</a>';
             }
         });
         
@@ -142,7 +142,8 @@ $(function() {
                     container.collagePlusPlus({
                         'firstRowTargetHeight': firstRowHeightPercent * container.width() / 100,
                         'secondaryRowsTargetHeight': secondaryRowsHeightPercent * container.width() / 100,
-                        'visibleRowCount': visibleRowCount
+                        'visibleRowCount': visibleRowCount,
+                        'allowPartialLastRow' : true
                     });
                 }
             }).attr('src', img.attr('src'));

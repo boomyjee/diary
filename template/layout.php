@@ -8,10 +8,10 @@
         <title>Diary</title>
         
         <? minify('css','diary',
-            'assets/css/style.css',
             'assets/lib/flowplayer/skin/skin.css',
             'assets/lib/fancybox/jquery.fancybox.css',
-            'assets/lib/flowplayer/flowplayer.overlay.fancybox.css'
+            'assets/lib/flowplayer/flowplayer.overlay.fancybox.css',
+            'assets/css/style.css'
         ) ?>
         
         <script src="<?= url('assets/lib/jquery-ui/external/jquery/jquery.js') ?>"></script>

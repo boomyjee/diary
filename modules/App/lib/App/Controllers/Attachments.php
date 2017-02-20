@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use \App\Models\Entry;
 
-class Attachments extends BasePrivate {
+class Attachments extends Base {
     
     public function __construct() {
         parent::__construct();
@@ -127,7 +127,7 @@ class Attachments extends BasePrivate {
             $attachmentType = Entry::getAttachmentType($filename);
             if ($attachmentType == Entry::ATTACHMENT_TYPE_IMAGE) {
                 \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpImgsPreviewDir.'/'.$filename, 500, 500); //generate preview
-                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1280, 950); //generate resized copy
+                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1920, 1200); //generate resized copy
                 $previewUrl = url('tmp_files/images_preview/'.rawurlencode($filename));
             } elseif ($attachmentType == Entry::ATTACHMENT_TYPE_VIDEO) {
                 $previewUrl = url('assets/images/video-thumb.jpg');

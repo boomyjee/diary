@@ -4,8 +4,13 @@ namespace App\Controllers;
 
 use \App\Models\Entry;
 
-class Entries extends BasePrivate {
+class Entries extends Base {
         
+    protected function getPage() {
+        if (isset($_GET['p'])) $page = (int)$_GET['p']; else $page = 1;if ($page<=1) $page = 1;
+        return $page;
+    }
+
     public function entries() {       
         $entryId = !empty($_POST['entry_id']) ? $_POST['entry_id'] : false;
         if (isset($_POST['action'])) { 
@@ -41,7 +46,7 @@ class Entries extends BasePrivate {
             $hashTags = $matches[1];
         }
         
-        $limit = 5;
+        $limit = 20;
         $offset = ($this->getPage() - 1) * $limit;
         $query = Entry::getSearchQuery($entryId, $this->user, $searchText, $hashTags);
         $total = \DoctrineExtensions\Paginate\Paginate::getTotalQueryResults($query);
