@@ -695,8 +695,13 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     background: rgba(0, 130, 195, 0.78);
 }
 
+span.page-loading {
+    position: relative;
+    height: 40px;
+    display: block;
+}
 .entry.loading:before, .add-entry.loading:before,
-.media-prev:before, .load-more.loading:before {
+.media-prev:before, span.page-loading:before {
     content: '';
     position: absolute;
     top: 0;
@@ -708,7 +713,7 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     pointer-events: none;
 }
 .media-prev:before,
-.load-more.loading:before {
+span.page-loading:before {
     background-size: 70px;
 }
 .media-prev.inited > div {
@@ -821,10 +826,7 @@ form.entry-form input[type=range]:focus::-ms-fill-upper {
     margin: 0;
 }
 .entry-list .load-more {
-    text-align: center;
-}
-.entry-list .load-more a {
-    margin: 10px 0 0;
+    display: none;
 }
 
 .login .auth-block {

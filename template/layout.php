@@ -21,6 +21,7 @@
         <script src="<?= url('assets/lib/jquery-fileupload/jquery.fileupload.js') ?>"></script>
         <script src="<?= url('assets/lib/remove-whitespace/jquery.removeWhitespace.min.js') ?>"></script>
         <script src="<?= url('assets/lib/fancybox/jquery.fancybox.pack.js') ?>"></script>
+        <script src="<?= url('assets/lib/infinitescroll/jquery.infinitescroll.js') ?>"></script>
         
         <script src="<?= url('assets/lib/flowplayer/flowplayer.min.js') ?>"></script>
         <script src="<?= url('assets/lib/flowplayer/flowplayer.hlsjs.min.js') ?>"></script>
