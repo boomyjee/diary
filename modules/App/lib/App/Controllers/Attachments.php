@@ -99,7 +99,7 @@ class Attachments extends Base {
     }
     
     public function upload() {
-        $tmpFilesDir = INDEX_DIR.'/tmp_files';
+        $tmpFilesDir = INDEX_DIR.'/cache/tmp_files';
         $tmpImgsPreviewDir = $tmpFilesDir.'/images_preview';
         $tmpResizedImgsDir = $tmpFilesDir.'/resized_images';
         
@@ -118,22 +118,40 @@ class Attachments extends Base {
         }
         
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-            $filename = uniqid().'_'.$_FILES['attachment']['name'];
-            $fileinfo = pathinfo($filename);
+            $fileinfo = pathinfo($_FILES['attachment']['name']);
             $filename = mb_substr($fileinfo['filename'], 0, 100, 'UTF-8').'.'.$fileinfo['extension'];
+            $counter = 1;
+            if (file_exists($tmpFilesDir.'/'.$filename)) {
+                $basename = pathinfo($filename, PATHINFO_FILENAME);
+                $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                while (file_exists($tmpFilesDir.'/'.$basename.'('.$counter.').'.$extension)) {
+                    $counter++;
+                }
+                $filename = $basename.'('.$counter.').'.$extension;
+            }
             move_uploaded_file($_FILES['attachment']['tmp_name'], $tmpFilesDir.'/'.$filename);
                 
+            $resizeAttachedImage = function($imagePath, $destinationPath, $width, $height) {
+                try {
+                    $file = \PhpThumb\Factory::create($imagePath, ['resizeUp' => false]);
+                    $file->resize($width, $height);
+                    $file->save($destinationPath);
+                } catch (\Exception $e) {
+                    trigger_error($e->getMessage());
+                }
+            };
+
             $previewUrl = '';
             $attachmentType = Entry::getAttachmentType($filename);
             if ($attachmentType == Entry::ATTACHMENT_TYPE_IMAGE) {
-                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpImgsPreviewDir.'/'.$filename, 500, 500); //generate preview
-                \App\Models\Entry::resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1920, 1200); //generate resized copy
-                $previewUrl = url('tmp_files/images_preview/'.rawurlencode($filename));
+                $resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpImgsPreviewDir.'/'.$filename, 500, 500); //generate preview
+                $resizeAttachedImage($tmpFilesDir.'/'.$filename, $tmpResizedImgsDir.'/'.$filename, 1920, 1200); //generate resized copy
+                $previewUrl = url('cache/tmp_files/images_preview/'.rawurlencode($filename));
             } elseif ($attachmentType == Entry::ATTACHMENT_TYPE_VIDEO) {
                 $previewUrl = url('assets/images/video-thumb.jpg');
             }
             
-            echo json_encode(['status' => 'success', 'original_filename' => Entry::getAttachmentOriginalName($filename), 'filename' => $filename, 'preview_url' => $previewUrl]);
+            echo json_encode(['status' => 'success', 'filename' => $filename, 'preview_url' => $previewUrl]);
         }
     }
 }

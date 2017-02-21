@@ -19,6 +19,7 @@ class Entries extends Base {
             if ($_POST['action'] == 'edit_entry') {
                 if (!empty($_POST['text']) || !empty($_POST['attachments'])) {
                     if (!$entry) $entry = new Entry;
+                    else $entry->updated = new \DateTime('now');
                     $entry->text = !empty($_POST['text']) ? strip_tags($_POST['text']) : '';
                     $entry->attachments = !empty($_POST['attachments']) ? $_POST['attachments'] : [];
                     $entry->attachment_preview_settings = [

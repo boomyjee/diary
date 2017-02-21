@@ -82,7 +82,7 @@
                                     <div class="without-prev">
                                         <? foreach ($withoutPreview as $attachment): ?>
                                             <div class="item">
-                                                <p><?= \App\Models\Entry::getAttachmentOriginalName($attachment) ?></p>
+                                                <p><?= $attachment ?></p>
                                                 <input type="hidden" name="attachments[]" value="<?= $attachment ?>">
                                                 <span class="remove"></span>
                                             </div>
@@ -146,16 +146,15 @@
                                         </div>
                                         <div class="without-prev">
                                             <? foreach ($withoutPreview as $attachment): ?>
-                                                <? $originalName = \App\Models\Entry::getAttachmentOriginalName($attachment) ?>
                                                 <? if (\App\Models\Entry::getAttachmentType($attachment) == \App\Models\Entry::ATTACHMENT_TYPE_AUDIO): ?>
                                                     <div class="audio">
                                                         <audio controls="true" preload="none">
                                                             <source src="<?= url('entry_attachments/'.$entry->id.'/'.rawurlencode($attachment)) ?>" type="audio/mpeg">
                                                         </audio>
-                                                        <span><?= $originalName ?></span>
+                                                        <span><?= $attachment ?></span>
                                                     </div>
                                                 <? else: ?>
-                                                    <a href="<?= url('entry_attachments/'.$entry->id.'/'.rawurlencode($attachment)) ?>"><?= $originalName ?></a>
+                                                    <a href="<?= url('entry_attachments/'.$entry->id.'/'.rawurlencode($attachment)) ?>"><?= $attachment ?></a>
                                                 <? endif ?>
                                             <? endforeach ?>
                                         </div>

@@ -20,6 +20,9 @@ class Entry extends \ActiveEntity
     
     /** @Column(type="datetime") */
     public $created;
+
+    /** @Column(type="datetime", nullable=true) */
+    public $updated;
     
     /** @Column(type="array") */
     public $attachments;
@@ -57,7 +60,13 @@ class Entry extends \ActiveEntity
     }
    
     /** @PreUpdate */
-    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $event) {        
+    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $event) {
+        $tmpFilesDir = INDEX_DIR.'/cache/tmp_files'; 
+        foreach ($this->attachments as $attachment) {
+            if (file_exists($tmpFilesDir.'/'.$attachment))
+                $this->synced = false;  
+        }
+
         if ($event->hasChangedField('attachments') || $event->hasChangedField('text') || $event->hasChangedField('deleted')) 
             $this->synced = false;
     }
@@ -77,7 +86,7 @@ class Entry extends \ActiveEntity
 
         $this->setTags($newTags);
         
-        $tmpFilesDir = INDEX_DIR.'/tmp_files';
+        $tmpFilesDir = INDEX_DIR.'/cache/tmp_files';
         $attachmentsDir = INDEX_DIR.'/entry_attachments/'.$this->id;
         
         $directories = [
@@ -91,13 +100,11 @@ class Entry extends \ActiveEntity
             if (!file_exists($dir)) mkdir($dir, 0755, true);
 
         foreach ($this->attachments as $attachment) {
-            if (file_exists($attachmentsDir.'/'.$attachment)) continue;
             if (!file_exists($tmpFilesDir.'/'.$attachment)) continue;
             
             $attachmentType = self::getAttachmentType($attachment);
             if ($attachmentType == self::ATTACHMENT_TYPE_IMAGE) {                
                 foreach (['images_preview', 'resized_images'] as $subDir) {
-                    if (file_exists($attachmentsDir.'/'.$subDir.'/'.$attachment)) continue;
                     if (file_exists($tmpFilesDir.'/'.$subDir))
                         rename($tmpFilesDir.'/'.$subDir.'/'.$attachment, $attachmentsDir.'/'.$subDir.'/'.$attachment);
                 }
@@ -154,20 +161,6 @@ class Entry extends \ActiveEntity
         }
         
         return  self::ATTACHMENT_TYPE_OTHER;
-    }
-    
-    public static function getAttachmentOriginalName($attachment) {
-        return mb_substr($attachment, 14, null, 'UTF-8');
-    }
-    
-    public static function resizeAttachedImage($imagePath, $destinationPath, $width, $height) {
-        try {
-            $file = \PhpThumb\Factory::create($imagePath, ['resizeUp' => false]);
-            $file->resize($width, $height);
-            $file->save($destinationPath);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage());
-        }
     }
     
     public function getTags() {

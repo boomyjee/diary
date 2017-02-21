@@ -35,7 +35,7 @@ class Cron extends \Bingo\Controller {
         foreach ($entries as $entry) {
             $cloudAttachmentsDir = \App\Models\Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entry->id;
             $localAttachmentsDir = INDEX_DIR.'/entry_attachments/'.$entry->id;
-            $tmpFilesDir = INDEX_DIR.'/tmp_files';
+            $tmpFilesDir = INDEX_DIR.'/cache/tmp_files';
             $synced = true;
             
             if (!$entry->deleted) {
@@ -71,7 +71,7 @@ class Cron extends \Bingo\Controller {
                 }
 
                 foreach ($entry->attachments as $attachment) {
-                    if (in_array($attachment, $existedAttachments)) continue;
+                    if (in_array($attachment, $existedAttachments) && !file_exists($tmpFilesDir.'/'.$attachment)) continue;
                     if (!file_exists($tmpFilesDir.'/'.$attachment)) {
                         trigger_error('Attachment '.$attachment.' was not found in temporary folder');
                         continue;

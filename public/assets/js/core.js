@@ -45,7 +45,7 @@ $(function() {
                             data.context.addClass('error');
                         } else {
                             if (result.preview_url) {
-                                var preview = $('<img>', {'src': result.preview_url});
+                                var preview = $('<img>', {'src': result.preview_url+'?t='+(new Date()).getTime()});
                                 $('<img/>').load(function() {
                                     attachmentBlock.empty().append($('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename})).css({'visibility': 'hidden'});
                                     var mediaPreviewsBlock = attachmentBlock.parents('.entry-form').find('.media-prev');
@@ -63,7 +63,7 @@ $(function() {
                             } else {
                                 attachmentBlock.empty().append(
                                     $('<input>', {'type': 'hidden', 'name': 'attachments[]', 'value': result.filename}),
-                                    $('<p>').text(result.original_filename),
+                                    $('<p>').text(result.filename),
                                     $('<span>', {'class': 'remove'})
                                 );
                                 attachmentBlock.appendTo(attachmentBlock.parents('.entry-form').find('.without-prev'));
