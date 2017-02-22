@@ -4,8 +4,7 @@ namespace App\Controllers;
 
 class Auth extends Base {
     public function __construct() {
-        $this->checkUser = false;
-        parent::__construct();
+        parent::__construct($checkUser = false);
     }
 
     public function login() {
