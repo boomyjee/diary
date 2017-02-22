@@ -106,10 +106,10 @@ class Entry extends \ActiveEntity
             if ($attachmentType == self::ATTACHMENT_TYPE_IMAGE) {                
                 foreach (['images_preview', 'resized_images'] as $subDir) {
                     if (file_exists($tmpFilesDir.'/'.$subDir))
-                        rename($tmpFilesDir.'/'.$subDir.'/'.$attachment, $attachmentsDir.'/'.$subDir.'/'.$attachment);
+                        @rename($tmpFilesDir.'/'.$subDir.'/'.$attachment, $attachmentsDir.'/'.$subDir.'/'.$attachment);
                 }
             } else if (in_array($attachmentType, [self::ATTACHMENT_TYPE_OTHER, self::ATTACHMENT_TYPE_AUDIO])) {
-                copy($tmpFilesDir.'/'.$attachment, $attachmentsDir.'/'.$attachment);
+                @copy($tmpFilesDir.'/'.$attachment, $attachmentsDir.'/'.$attachment);
             }
         }
     }

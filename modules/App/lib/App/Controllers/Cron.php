@@ -41,30 +41,20 @@ class Cron extends \Bingo\Controller {
             if (!$entry->deleted) {
                 $filename = uniqid($entry->id.'_').".txt";
                 file_put_contents($tmpFilesDir.'/'.$filename, $entry->text);
-                try {
-                    $cloudAPI->loadFile($tmpFilesDir.'/'.$filename, \App\Models\Entry::CLOUD_STORAGE_TEXT_FILENAME, $cloudAttachmentsDir);
-                } catch (\Exception $e) {
-                    $synced = false;
-                }
+                $res = $cloudAPI->loadFile($tmpFilesDir.'/'.$filename, \App\Models\Entry::CLOUD_STORAGE_TEXT_FILENAME, $cloudAttachmentsDir);
+                if ($res === false) $synced = false;
                 unlink($tmpFilesDir.'/'.$filename);
 
-                $cloudFiles = [];
-                try {
-                    $cloudFiles = $cloudAPI->getFiles($cloudAttachmentsDir);
-                } catch (\Exception $e) {
-                    $synced = false;
-                }
+                $cloudFiles = $cloudAPI->getFiles($cloudAttachmentsDir);
+                if ($cloudFiles === false) continue;
 
                 $existedAttachments = [];
                 foreach ($cloudFiles as $file) {
                     if ($file['name'] == \App\Models\Entry::CLOUD_STORAGE_TEXT_FILENAME) continue;
                     if (!in_array($file['name'], $entry->attachments)) {
-                        try {
-                            $cloudAPI->removeFile($cloudAttachmentsDir.'/'.$file['name']);
-                             @unlink($localAttachmentsDir.'/'.$file['name']);
-                        } catch (\Exception $e) {
-                            $synced = false;
-                        }
+                        $res = $cloudAPI->removeFile($cloudAttachmentsDir.'/'.$file['name']);
+                        if ($res !== false) @unlink($localAttachmentsDir.'/'.$file['name']);
+                        else $synced = false;
                     } else { 
                         $existedAttachments[] = $file['name'];
                     }
@@ -77,12 +67,9 @@ class Cron extends \Bingo\Controller {
                         continue;
                     }
                     
-                    try {
-                        $cloudAPI->loadFile($tmpFilesDir.'/'.$attachment, $attachment, $cloudAttachmentsDir);
-                        unlink($tmpFilesDir.'/'.$attachment);
-                    } catch (\Exception $e) {
-                        $synced = false;
-                    }
+                    $res = $cloudAPI->loadFile($tmpFilesDir.'/'.$attachment, $attachment, $cloudAttachmentsDir);
+                    if ($res !== false) unlink($tmpFilesDir.'/'.$attachment);
+                    else $synced = false; 
                 }
                 
                 if ($synced) {
@@ -90,14 +77,11 @@ class Cron extends \Bingo\Controller {
                     $entry->save();
                 }
             } else {
-                try {
-                    $cloudAPI->removeFile($cloudAttachmentsDir);
+                $res = $cloudAPI->removeFile($cloudAttachmentsDir);
+                if ($res !== false) {
+                    $entry->delete();
                     $removeDir($localAttachmentsDir);
-                } catch (\Exception $e) {
-                    $synced = false;
                 }
-                
-                if ($synced) $entry->delete();
             }
         }
     }

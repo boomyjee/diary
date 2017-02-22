@@ -228,8 +228,9 @@ $(function() {
         var entryEl = $(this).parents('.entry');
         var entryId = entryEl.find('input[name=entry_id]').val();
         entryEl.remove();
-        $.post(location.href, {action: 'delete_entry', entry_id: entryId});
-        $.get(base_url + 'sync-entries');
+        $.post(location.href, {action: 'delete_entry', entry_id: entryId}, function() {
+            $.get(base_url + 'sync-entries');
+        });
     });
     
     $(document).on('submit', '.entry-form', function(e) {

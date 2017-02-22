@@ -3,8 +3,6 @@
 class App extends \Bingo\Module {
     function __construct() {
         parent::__construct();
-
-        require __DIR__.'/Guzzle/vendor/autoload.php';
         
         \Bingo\Config::loadFile('config',INDEX_DIR."/../config.php");
         

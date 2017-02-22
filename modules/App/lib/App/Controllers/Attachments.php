@@ -26,11 +26,7 @@ class Attachments extends Base {
         }
         
         header('Content-type: '.$ctype);        
-        try {
-            echo $this->cloudAPI->getFileContent($imagePath);
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage());
-        }
+        echo $this->cloudAPI->getFileContent($imagePath);
     }
     
     public function show_video_thumb($entryId, $videoName) {
@@ -42,60 +38,45 @@ class Attachments extends Base {
             mkdir($videoThumbsDir, $mode = 0755, $recursive = true);
         
         if (!file_exists($videoThumbsPath)) {
-            try {
-                $file = fopen($videoThumbsPath, "w");
-                fwrite($file, $this->cloudAPI->getVideoThumb(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName));
-                fclose($file);
-            } catch (\Exception $e) {
-                // can't get video thumb or thumb isn't uploaded to storage yet
-                unlink($videoThumbsPath);
+            $entry = Entry::find($entryId);
+            if ($entry && $entry->synced) {
+                $thumbData = $this->cloudAPI->getVideoThumb(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName);
+                if ($thumbData) {
+                    $file = fopen($videoThumbsPath, "w+");
+                    fwrite($file, $thumbData);
+                    fclose($file);
+                }
             }
         }
         
-        if (!file_exists($videoThumbsPath))
+        if (!file_exists($videoThumbsPath)) {
             $videoThumbsPath = INDEX_DIR . '/assets/images/video-thumb.jpg';
+            header('Cache-Control: no-cache');
+        } else {
+            header('Cache-Control: max-age=3600');
+        }
             
-        $thumbInfo = getimagesize($videoThumbsPath);
+        $thumbInfo = @getimagesize($videoThumbsPath);
         $mimeInfo = isset($thumbInfo['mime']) ? $thumbInfo['mime'] : null;
         header("Content-type: $mimeInfo");
-        header('Cache-Control: max-age=3600');
         readfile($videoThumbsPath);
     }
     
     public function video_bitrate_list($entryId, $videoName) {
         if (!$entryId || !$videoName) return; 
         header("Content-type: application/x-mpegURL");
-        try {
-            $list = $this->cloudAPI->getVideoBitrates(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName);
-        } catch (\Exception $e) {
-            // can't get video bitrate list or video isn't uploaded to storage yet
-            return;
-        }
+        $list = $this->cloudAPI->getVideoBitrates(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName);
         echo preg_replace('/\/media\//', 'https://'.$_SERVER['HTTP_HOST'].url('/video-part-list/media/'), $list);
     }
     
     public function video_part_list($videoUrl) {
         header("Content-type: application/x-mpegURL");
-        try {
-            $playList = $this->cloudAPI->getVideo($videoUrl.'?double_encode=1');
-        } catch (\Exception $e) {
-            // can't get video part list or video isn't uploaded to storage yet
-            return;
-        }
-        echo preg_replace('/\/media\//', 'https://'.$_SERVER['HTTP_HOST'].url('/play-video/media/'), $playList);
+        $list = $this->cloudAPI->getVideo($videoUrl.'?double_encode=1');
+        echo preg_replace('/\/media\//', 'https://'.$_SERVER['HTTP_HOST'].url('/play-video/media/'), $list);
     }
     
     public function play_video($videoUrl) {
-        $tryCount = 2;
-        while ($tryCount--) {
-            try {
-                echo $this->cloudAPI->getVideo($videoUrl.'?double_encode=1');
-                break;
-            } catch (\Exception $e) {
-                if ($tryCount == 0)
-                    trigger_error($e->getMessage());
-            }
-        }
+        echo $this->cloudAPI->getVideo($videoUrl.'?double_encode=1');
     }
     
     public function upload() {
@@ -118,12 +99,13 @@ class Attachments extends Base {
         }
         
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] == 0) {
-            $fileinfo = pathinfo($_FILES['attachment']['name']);
-            $filename = mb_substr($fileinfo['filename'], 0, 100, 'UTF-8').'.'.$fileinfo['extension'];
+            $fileinfo = pathinfo(' '.$_FILES['attachment']['name']);
+            $basename = mb_substr(trim($fileinfo['filename']), 0, 100, 'UTF-8');
+            $extension = $fileinfo['extension'];
+            $filename = $basename.'.'.$extension;
+
             $counter = 1;
             if (file_exists($tmpFilesDir.'/'.$filename)) {
-                $basename = pathinfo($filename, PATHINFO_FILENAME);
-                $extension = pathinfo($filename, PATHINFO_EXTENSION);
                 while (file_exists($tmpFilesDir.'/'.$basename.'('.$counter.').'.$extension)) {
                     $counter++;
                 }
