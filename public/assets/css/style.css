@@ -450,14 +450,13 @@ form.entry-form .textfield {
 }
 form.entry-form .textfield textarea {
     display: block;
-    vertical-align: top;
     overflow: auto;
     width: 100%;
     height: 50px;
     padding: 14px 12px;
     border: 0;
     border-radius: 2px;
-    line-height: 1.4;
+    line-height: 1.5;
     word-wrap: break-word;
     resize: none;
     box-shadow: none;
@@ -759,6 +758,9 @@ span.page-loading:before {
 }
 .media-prev + .show-all-attachments a img {
     opacity: 0.2;
+}
+.media-prev + .show-all-attachments a:hover img {
+    opacity: 0.5;
 }
 .media-prev + .show-all-attachments.shown .hide-all {
     display: block;
