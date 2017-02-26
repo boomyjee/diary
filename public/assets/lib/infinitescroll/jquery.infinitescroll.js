@@ -543,7 +543,6 @@
         },
 
         beginAjax: function infscr_ajax(opts) {
-            console.log(123);
             var instance = this,
                 path = opts.path,
                 box, desturl, method, condition;

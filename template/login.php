@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="form-group text-center">
-                    <div class="form-group inline">
+                    <div class="inline">
                         <div class="checkbox">
                             <? $login_form->findElement('remember_me')->render(); ?>
                         </div>

@@ -114,7 +114,7 @@
                      * it's time to make a row out of our images
                      *
                      */
-                    if ( row > settings.albumWidth && elements.length != 0 ){
+                    if ( (row > settings.albumWidth || settings.images.length-1 == index) && elements.length != 0 ){
 
                         // call the method that calculates the final image sizes
                         resizeRow(elements, row, settings, rownum, rowOffsetTop);
@@ -126,27 +126,7 @@
                         elements    = [];
                         rownum      += 1;
                         rowOffsetTop += $this.is(':visible') ? ($this.height() + settings.padding) : 0;
-                        $this.parent().height(rowOffsetTop);
-                    }
-
-
-                    /*
-                     *
-                     * if the images left are not enough to make a row
-                     * then we'll force them to make one anyway
-                     *
-                     */
-                    if ( settings.images.length-1 == index && elements.length != 0){
-                        resizeRow(elements, row, settings, rownum, rowOffsetTop);
-
-                        // reset our row
-                        delete row;
-                        delete elements;
-                        row         = 0;
-                        elements    = [];
-                        rownum      += 1;
-                        rowOffsetTop += $this.is(':visible') ? $this.height() : 0;
-                        $this.parent().height(rowOffsetTop);
+                        $this.parent().height(rowOffsetTop - settings.padding);
                     }
                     
                     if (index == settings.images.length - 1)
