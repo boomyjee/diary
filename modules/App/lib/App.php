@@ -4,7 +4,7 @@ class App extends \Bingo\Module {
     function __construct() {
         parent::__construct();
         
-        \Bingo\Config::loadFile('config',INDEX_DIR."/../config.php");
+        \Bingo\Config::loadFile('config',APP_DIR."/config.php");
         
         $this->addModelPath(__DIR__."/App/Models");
 

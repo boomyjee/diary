@@ -270,7 +270,7 @@ class CloudMailruAPI {
             curl_setopt($this->curl, CURLOPT_HEADER, 0);
         }
 
-        $cookiePath = INDEX_DIR . '/cache/temp_cookie.dat';
+        $cookiePath = APP_DIR . '/cache/temp_cookie.dat';
         if (!file_exists($cookiePath)) file_put_contents($cookiePath, '');
         curl_setopt($this->curl, CURLOPT_COOKIEJAR, $cookiePath);
         curl_setopt($this->curl, CURLOPT_COOKIEFILE, $cookiePath);

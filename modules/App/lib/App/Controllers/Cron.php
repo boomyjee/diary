@@ -5,7 +5,7 @@ namespace App\Controllers;
 class Cron extends \Bingo\Controller {
     
     public function __construct() {
-        $lock_dir = INDEX_DIR."/cache/cron_locks";
+        $lock_dir = APP_DIR."/cache/cron_locks";
         if (!file_exists($lock_dir)) mkdir($lock_dir);
 
         $locked_file = @fopen($lock_dir."/".\Bingo\Routing::$route['action'],"w+");
