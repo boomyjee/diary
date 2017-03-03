@@ -1,7 +1,7 @@
 <?php
 
 define('APP_DIR',__DIR__.'/../');
-define('BINGO_PATH',__DIR__.'/../../bingo');
+define('BINGO_PATH',__DIR__.'/../../../public_html/bingo');
 require_once BINGO_PATH . "/loader.php";
 
 ini_set('display_errors',1);
