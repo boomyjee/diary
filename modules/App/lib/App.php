@@ -27,6 +27,7 @@ class App extends \Bingo\Module {
         $this->connect('admin/app/:action/:id', ['controller' => 'App\Controllers\Admin\Users', 'id' => false],
             ['action'=>'(user-list|user-edit)']
         );
+        $this->connect('admin/developer/:action/:id', ['controller' => 'App\Controllers\Admin\Developer', 'id' => false]);        
         
         $this->connect("developer/:action", ['controller' => 'App\Controllers\Developer']);
         $this->connect("sync-entries", ['controller' => 'App\Controllers\Cron', 'action' => 'sync-entries']);

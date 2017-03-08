@@ -15,7 +15,7 @@ date_default_timezone_set('Europe/Kiev');
 \Bingo\Configuration::addModules('Auth','Meta','CMS','App');
 
 require __DIR__."/../db.php";
-\Bingo\Template::addIncludePath('',BINGO_PATH."/template",INDEX_URL."/../../bingo/template");
+\Bingo\Template::addIncludePath('',BINGO_PATH."/template","//uxcandy.com/~boomyjee/bingo/template");
 
 \CMS\Configuration::$log_errors = true;
 

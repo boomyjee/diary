@@ -66,13 +66,13 @@ class Attachments extends Base {
         if (!$entryId || !$videoName) return; 
         header("Content-type: application/x-mpegURL");
         $list = $this->cloudAPI->getVideoBitrates(Entry::CLOUD_STORAGE_BASE_FOLDER.'/'.$entryId.'/'.$videoName);
-        echo preg_replace('/\/media\//', 'https://'.$_SERVER['HTTP_HOST'].url('/video-part-list/media/'), $list);
+        echo preg_replace('/\/media\//', '//'.$_SERVER['HTTP_HOST'].url('/video-part-list/media/'), $list);
     }
     
     public function video_part_list($videoUrl) {
         header("Content-type: application/x-mpegURL");
         $list = $this->cloudAPI->getVideo($videoUrl.'?double_encode=1');
-        echo preg_replace('/\/media\//', 'https://'.$_SERVER['HTTP_HOST'].url('/play-video/media/'), $list);
+        echo preg_replace('/\/media\//', '//'.$_SERVER['HTTP_HOST'].url('/play-video/media/'), $list);
     }
     
     public function play_video($videoUrl) {
