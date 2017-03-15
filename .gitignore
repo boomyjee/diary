@@ -1,4 +1,5 @@
 db.php
+config.php
 /cache
 /public/cache
 /public/entry_attachments
